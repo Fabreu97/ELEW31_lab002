@@ -5,9 +5,24 @@
 ; Declarações EQU - Defines
 ;<NOME>         EQU <VALOR>
 ; ========================
-DISPLAY_U_EN	EQU	2_00100000
-DISPLAY_D_EN	EQU	2_00010000
-
+BASE_REGISTERS				EQU	0xE000E000
+NVIC_REG6_EN2_OFFSET		EQU	0X108
+NVIC_REG7_EN3_OFFSET		EQU	0X10C
+NVIC_INTERRUPT_NUMBER_53	EQU	2_00000000000000000000010000000000				;Interrupt GPIO Port L register
+NVIC_INTERRUPT_NUMBER_72	EQU	2_00000000100000000000000000000000				;Interrupt GPIO Port M register
+	
+PRI13_OFFSET				EQU	0x434											;GPIO Port L priority level register
+PRI18_OFFSET				EQU	0x448											;GPIO Port M priority level register
+	
+GPIOIS_PORT_L_BASE_R		EQU	0x40062000
+GPIOIS_PORT_M_BASE_R		EQU	0x40063000
+GPIOIS_OFFSET				EQU	0x404											;Borda ou nivel
+GPIOIBE_OFFSET				EQU	0x408											;1 ou 2 bordas
+GPIOIEV_OFFSET				EQU	0x40C											;Borda de subida ou descida
+GPIOIM_OFFSET				EQU	0x410											;Habilita a interrupção
+GPIOIS_VALUE				EQU	2_0000											;Borda
+GPIOIBE_VALUE				EQU	2_0000											;1 Borda
+GPIOIEV_VALUE				EQU	2_0001											;Interrupção habilitada
 ; -------------------------------------------------------------------------------
 ; Área de Dados - Declarações de variáveis
 		AREA  DATA, ALIGN=2
