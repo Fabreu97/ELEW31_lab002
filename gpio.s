@@ -31,7 +31,6 @@ GPIO_PORTJ_AHB_RIS_R    	EQU    	0x40060414
 GPIO_PORTJ_AHB_MIS_R    	EQU    	0x40060418
 GPIO_PORTJ_AHB_ICR_R    	EQU	   	0x4006041C
 GPIO_PORTJ               	EQU    	2_000000100000000
-;									  QPNMLKJHGFEDCBA
 ; PORT K
 GPIO_PORTK_DATA_R       	EQU 	0x400613FC
 GPIO_PORTK_DIR_R        	EQU 	0x40061400
@@ -50,7 +49,6 @@ GPIO_PORTK_CR_R         	EQU 	0x40061524
 GPIO_PORTK_AMSEL_R      	EQU 	0x40061528
 GPIO_PORTK_PCTL_R       	EQU 	0x4006152C
 GPIO_PORTK              	EQU		2_000001000000000
-;							  		  QPNMLKJHGFEDCBA
 ; PORT M
 GPIO_PORTM_DATA_R       	EQU 	0x400633FC
 GPIO_PORTM_DIR_R       		EQU 	0x40063400
@@ -69,7 +67,6 @@ GPIO_PORTM_CR_R         	EQU 	0x40063524
 GPIO_PORTM_AMSEL_R      	EQU 	0x40063528
 GPIO_PORTM_PCTL_R       	EQU 	0x4006352C
 GPIO_PORTM               	EQU 	2_000100000000000
-;									  QPNMLKJHGFEDCBA
 ; PORT N
 GPIO_PORTN_LOCK_R    		EQU    	0x40064520
 GPIO_PORTN_CR_R      		EQU    	0x40064524
@@ -81,7 +78,36 @@ GPIO_PORTN_DEN_R     		EQU    	0x4006451C
 GPIO_PORTN_PUR_R     		EQU    	0x40064510	
 GPIO_PORTN_DATA_R    		EQU    	0x400643FC
 GPIO_PORTN               	EQU    	2_001000000000000
-;									  QPNMLKJHGFEDCBA
+
+BASE_REGISTERS				EQU	0xE000E000
+;				NVIC
+NVIC_REG6_EN2_OFFSET		EQU	0X108
+NVIC_REG7_EN3_OFFSET		EQU	0X10C
+NVIC_INTERRUPT_NUMBER_53	EQU	2_00000000000000000000010000000000				;Interrupt GPIO Port L register
+NVIC_INTERRUPT_NUMBER_72	EQU	2_00000000100000000000000000000000				;Interrupt GPIO Port M register
+;				Priority
+PRI13_OFFSET				EQU	0x434											;GPIO Port L priority level register
+PRI18_OFFSET				EQU	0x448											;GPIO Port M priority level register
+;				Priority Values
+;PRI13_VALUE					EQU	2_000.00000.000.00000.001.00000.000.00000	;GPIO Port L priority level register
+PRI13_VALUE					EQU	2_00000000000000000010000000000000				;GPIO Port L priority level register
+;PRI18_VALUE					EQU	2_000.00000.000.00000.000.00000.001.00000	;GPIO Port M priority level register
+PRI18_VALUE					EQU	2_00000000000000000000000000100000				;GPIO Port M priority level register
+	
+GPIOIS_PORT_L_BASE_R		EQU	0x40062000
+GPIOIS_PORT_M_BASE_R		EQU	0x40063000
+;				Offsets
+GPIOIS_OFFSET				EQU	0x404											;Borda ou nivel
+GPIOIBE_OFFSET				EQU	0x408											;1 ou 2 bordas
+GPIOIEV_OFFSET				EQU	0x40C											;Borda de subida ou descida
+GPIOIM_OFFSET				EQU	0x410											;Habilita a interrupção
+GPIOICR_OFFSET				EQU 0x41C
+;				Values
+GPIOIS_VALUE				EQU	2_0000											;Borda
+GPIOIBE_VALUE				EQU	2_0000											;1 Borda
+GPIOIEV_VALUE				EQU	2_0001											;Interrupção habilitada
+GPIOICR_VALUE				EQU	0X01											;Limpa o registrador GPIORIS
+
 ; -------------------------------------------------------------------------------
 ; Área de Código - Tudo abaixo da diretiva a seguir será armazenado na memória de 
 ;                  código
@@ -223,6 +249,91 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
 			
 ; 14. Habilitar a interrupção no NVIC(pág)  ENx  // x varia de 0 a 3
 			BX      LR;						retorno GPIO_Init
+			
+; -------------------------------------------------------------------------------
+; ------- Interrupt_config ------------------------------------------------------
+; Configuração inicial para as interrupções
+; Entrada: Não tem
+; Saída: Não tem
+Interrupt_config
+	;	Desabilita a interrupção
+	MOV		R0, #GPIOIS_PORT_L_BASE_R
+	ADD		R0, #GPIOIM_OFFSET
+	MOV		R1, #0x00
+	STR		R1, [R0]
+	
+	MOV		R0, #GPIOIS_PORT_M_BASE_R
+	ADD		R0, #GPIOIM_OFFSET
+	MOV		R1, #0x00
+	STR		R1, [R0]
+	
+;		Configura tipo de interrupção
+	;GPIOBE
+	MOV		R0, #GPIOIS_PORT_L_BASE_R
+	ADD		R0, #GPIOIBE_OFFSET
+	MOV		R1, #GPIOIBE_VALUE
+	STR		R1, [R0]
+	
+	MOV		R0, #GPIOIS_PORT_M_BASE_R
+	ADD		R0, #GPIOIBE_OFFSET
+	MOV		R1, #GPIOIBE_VALUE
+	STR		R1, [R0]
+	
+	;GPIOIEV
+	MOV		R0, #GPIOIS_PORT_L_BASE_R
+	ADD		R0, #GPIOIEV_OFFSET
+	MOV		R1, #GPIOIEV_VALUE
+	STR		R1, [R0]
+	
+	MOV		R0, #GPIOIS_PORT_M_BASE_R
+	ADD		R0, #GPIOIEV_OFFSET
+	MOV		R1, #GPIOIEV_VALUE
+	STR		R1, [R0]
+	
+	;GPIOICR
+	MOV		R0, #GPIOIS_PORT_L_BASE_R
+	ADD		R0, #GPIOICR_OFFSET
+	MOV		R1, #GPIOICR_VALUE
+	STR		R1, [R0]
+	
+	MOV		R0, #GPIOIS_PORT_M_BASE_R
+	ADD		R0, #GPIOICR_OFFSET
+	MOV		R1, #GPIOICR_VALUE
+	STR		R1, [R0]
+	
+	;	Habilita a interrupção
+	MOV		R0, #GPIOIS_PORT_L_BASE_R
+	ADD		R0, #GPIOIM_OFFSET
+	MOV		R1, #0x01
+	STR		R1, [R0]
+	
+	MOV		R0, #GPIOIS_PORT_M_BASE_R
+	ADD		R0, #GPIOIM_OFFSET
+	MOV		R1, #0x01
+	STR		R1, [R0]
+	
+	;	Habilita a interrupção no NVIC
+	MOV		R0, #BASE_REGISTERS
+	ADD		R0, #NVIC_REG6_EN2_OFFSET
+	MOV		R1, #NVIC_INTERRUPT_NUMBER_53
+	STR		R1, [R0]
+	
+	MOV		R0, #BASE_REGISTERS
+	ADD		R0, #NVIC_REG6_EN3_OFFSET
+	MOV		R1, #NVIC_INTERRUPT_NUMBER_72
+	STR		R1, [R0]
+	
+	;	Seta a prioridade da interrupção
+	MOV		R0, #BASE_REGISTERS
+	ADD		R0, #PRI13_OFFSET
+	mov		R1, #PRI13_VALUE
+	STR		R1, [R0]
+	
+	MOV		R0, #BASE_REGISTERS
+	ADD		R0, #PRI18_OFFSET
+	mov		R1, #PRI18_VALUE
+	STR		R1, [R0]
+
 ; -------------------------------------------------------------------------------
 ; -------------------------------Funções-----------------------------------------
 ; -------------------------------------------------------------------------------
