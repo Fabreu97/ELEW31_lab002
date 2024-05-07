@@ -33,7 +33,7 @@ MSG_NOVA_SENHA			DCB			"  Nova senha:   ",0
 									; função <func>
 		IMPORT  PLL_Init
 		IMPORT  SysTick_Init
-		IMPORT  SysTick_Wait1ms			
+		IMPORT  SysTick_Wait1ms
 		IMPORT  GPIO_Init
 		IMPORT	LCD_Init
 		IMPORT	LCD_Write_Character

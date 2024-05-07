@@ -78,36 +78,41 @@ GPIO_PORTN_DEN_R     		EQU    	0x4006451C
 GPIO_PORTN_PUR_R     		EQU    	0x40064510	
 GPIO_PORTN_DATA_R    		EQU    	0x400643FC
 GPIO_PORTN               	EQU    	2_001000000000000
-
-BASE_REGISTERS				EQU	0xE000E000
-;				NVIC
-NVIC_REG6_EN2_OFFSET		EQU	0X108
-NVIC_REG7_EN3_OFFSET		EQU	0X10C
-NVIC_INTERRUPT_NUMBER_53	EQU	2_00000000000000000000010000000000				;Interrupt GPIO Port L register
-NVIC_INTERRUPT_NUMBER_72	EQU	2_00000000100000000000000000000000				;Interrupt GPIO Port M register
-;				Priority
-PRI13_OFFSET				EQU	0x434											;GPIO Port L priority level register
-PRI18_OFFSET				EQU	0x448											;GPIO Port M priority level register
-;				Priority Values
-;PRI13_VALUE					EQU	2_000.00000.000.00000.001.00000.000.00000	;GPIO Port L priority level register
-PRI13_VALUE					EQU	2_00000000000000000010000000000000				;GPIO Port L priority level register
-;PRI18_VALUE					EQU	2_000.00000.000.00000.000.00000.001.00000	;GPIO Port M priority level register
-PRI18_VALUE					EQU	2_00000000000000000000000000100000				;GPIO Port M priority level register
-	
-GPIOIS_PORT_L_BASE_R		EQU	0x40062000
-GPIOIS_PORT_M_BASE_R		EQU	0x40063000
-;				Offsets
-GPIOIS_OFFSET				EQU	0x404											;Borda ou nivel
-GPIOIBE_OFFSET				EQU	0x408											;1 ou 2 bordas
-GPIOIEV_OFFSET				EQU	0x40C											;Borda de subida ou descida
-GPIOIM_OFFSET				EQU	0x410											;Habilita a interrupção
-GPIOICR_OFFSET				EQU 0x41C
-;				Values
-GPIOIS_VALUE				EQU	2_0000											;Borda
-GPIOIBE_VALUE				EQU	2_0000											;1 Borda
-GPIOIEV_VALUE				EQU	2_0001											;Interrupção habilitada
-GPIOICR_VALUE				EQU	0X01											;Limpa o registrador GPIORIS
-
+;	Port L
+GPIO_PORTL_DATA_BITS_R  EQU 0x40062000
+GPIO_PORTL_DATA_R       EQU 0x400623FC 
+GPIO_PORTL_DIR_R        EQU 0x40062400 
+GPIO_PORTL_IS_R         EQU 0x40062404 
+GPIO_PORTL_IBE_R        EQU 0x40062408 
+GPIO_PORTL_IEV_R        EQU 0x4006240C 
+GPIO_PORTL_IM_R         EQU 0x40062410 
+GPIO_PORTL_RIS_R        EQU 0x40062414 
+GPIO_PORTL_MIS_R        EQU 0x40062418 
+GPIO_PORTL_ICR_R        EQU 0x4006241C 
+GPIO_PORTL_AFSEL_R      EQU 0x40062420 
+GPIO_PORTL_DR2R_R       EQU 0x40062500 
+GPIO_PORTL_DR4R_R       EQU 0x40062504 
+GPIO_PORTL_DR8R_R       EQU 0x40062508 
+GPIO_PORTL_ODR_R        EQU 0x4006250C 
+GPIO_PORTL_PUR_R        EQU 0x40062510 
+GPIO_PORTL_PDR_R        EQU 0x40062514 
+GPIO_PORTL_SLR_R        EQU 0x40062518 
+GPIO_PORTL_DEN_R        EQU 0x4006251C 
+GPIO_PORTL_LOCK_R       EQU 0x40062520 
+GPIO_PORTL_CR_R         EQU 0x40062524 
+GPIO_PORTL_AMSEL_R      EQU 0x40062528 
+GPIO_PORTL_PCTL_R       EQU 0x4006252C 
+GPIO_PORTL_ADCCTL_R     EQU 0x40062530 
+GPIO_PORTL_DMACTL_R     EQU 0x40062534 
+GPIO_PORTL_SI_R         EQU 0x40062538 
+GPIO_PORTL_DR12R_R      EQU 0x4006253C 
+GPIO_PORTL_WAKEPEN_R    EQU 0x40062540 
+GPIO_PORTL_WAKELVL_R    EQU 0x40062544 
+GPIO_PORTL_WAKESTAT_R   EQU 0x40062548 
+GPIO_PORTL_PP_R         EQU 0x40062FC0 
+GPIO_PORTL_PC_R         EQU 0x40062FC4
+GPIO_PORTL				EQU	2_000010000000000
+;QPNMLKJHGFEDCBA
 ; -------------------------------------------------------------------------------
 ; Área de Código - Tudo abaixo da diretiva a seguir será armazenado na memória de 
 ;                  código
@@ -133,14 +138,16 @@ GPIO_Init
 			ORR		R1, #GPIO_PORTJ					;Seta o bit da porta J, fazendo com OR
 			ORR     R1, #GPIO_PORTM					;Seta o bit da porta M, fazendo com OR
 			ORR     R1, #GPIO_PORTN					;Seta o bit da porta N, fazendo com OR
+			ORR     R1, #GPIO_PORTL					;Seta o bit da porta L, fazendo com OR
             STR     R1, [R0]						;Move para a memória os bits das portas no endereço do RCGCGPIO
  
             LDR     R0, =SYSCTL_PRGPIO_R			;Carrega o endereço do PRGPIO para esperar os GPIO ficarem prontos
 EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do registrador
 			MOV     R2, #GPIO_PORTK                 ;Seta os bits correspondentes às portas para fazer a comparação
 			ORR     R2, #GPIO_PORTJ                 ;Seta o bit da porta J, fazendo com OR
-			ORR     R1, #GPIO_PORTM					;Seta o bit da porta M, fazendo com OR
-			ORR     R1, #GPIO_PORTN					;Seta o bit da porta N, fazendo com OR
+			ORR     R2, #GPIO_PORTM					;Seta o bit da porta M, fazendo com OR
+			ORR     R2, #GPIO_PORTN					;Seta o bit da porta N, fazendo com OR
+			ORR     R2, #GPIO_PORTL					;Seta o bit da porta L, fazendo com OR
             TST     R1, R2							;Testa o R1 com R2 fazendo R1 & R2
             BEQ     EsperaGPIO					    ;Se o flag Z=1, volta para o laço. Senão continua executando
 ; 2. Limpar o AMSEL para desabilitar a função analógica
@@ -152,6 +159,8 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
 			LDR		R0, =GPIO_PORTM_AMSEL_R;
 			STR		R1, [R0];
 			LDR		R0, =GPIO_PORTN_AMSEL_R;
+			STR		R1, [R0];
+			LDR		R0, =GPIO_PORTL_AMSEL_R;
 			STR		R1, [R0];
 ; 3. Limpar PCTL para selecionar o GPIO
             MOV     R1, #0x00					    ;Colocar 0 no registrador para selecionar o modo GPIO
@@ -167,9 +176,12 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
 			
             LDR     R0, =GPIO_PORTN_PCTL_R      	;Carrega o R0 com o endereço do PCTL para a porta N
             STR     R1, [R0]                        ;Guarda no registrador PCTL da porta N da memória
+			
+            LDR     R0, =GPIO_PORTL_PCTL_R      	;Carrega o R0 com o endereço do PCTL para a porta N
+            STR     R1, [R0]                        ;Guarda no registrador PCTL da porta N da memória
 ; 4. DIR para 0 se for entrada, 1 se for saída
 			LDR		R0, =GPIO_PORTJ_AHB_DIR_R
-			MOV		R1, #2_11						;J1~J0
+			MOV		R1, #2_00000011						;J1~J0
 			STRB	R1, [R0]
 			
 			LDR		R0, =GPIO_PORTK_DIR_R
@@ -181,7 +193,11 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
 			STRB	R1, [R0]
 			
             LDR     R0, =GPIO_PORTN_DIR_R			;Carrega o R0 com o endereço do DIR para a porta N
-			MOV     R1, #2_0011						;PN1 PN0
+			MOV     R1, #2_00000011						;PN1 PN0
+            STRB    R1, [R0]						;Guarda no registrador
+		
+            LDR     R0, =GPIO_PORTL_DIR_R			;Carrega o R0 com o endereço do DIR para a porta N
+			MOV     R1, #2_00000000					;PN1 PN0
             STRB    R1, [R0]						;Guarda no registrador
 			; O certo era verificar os outros bits da PJ para não transformar entradas em saídas desnecessárias
 ; 5. Limpar os bits AFSEL para 0 para selecionar GPIO 
@@ -218,6 +234,10 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
 			LDR     R0, =GPIO_PORTJ_AHB_PUR_R			;Carrega o endereço do PUR para a porta J
 			MOV     R1, #2_11							;Habilitar funcionalidade digital de resistor de pull-up 
             STRB    R1, [R0]							;Escreve no registrador da memória do resistor de pull-up
+			
+			LDR     R0, =GPIO_PORTL_PUR_R			;Carrega o endereço do PUR para a porta J
+			MOV     R1, #2_00001111							;Habilitar funcionalidade digital de resistor de pull-up 
+            STRB    R1, [R0]							;Escreve no registrador da memória do resistor de pull-up
 ; 8. Desabilitar as configurações dos registradores GPIOIM
 			LDR		R0, =GPIO_PORTJ_AHB_IM_R
 			MOV		R1, #2_00;
@@ -249,90 +269,6 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
 			
 ; 14. Habilitar a interrupção no NVIC(pág)  ENx  // x varia de 0 a 3
 			BX      LR;						retorno GPIO_Init
-			
-; -------------------------------------------------------------------------------
-; ------- Interrupt_config ------------------------------------------------------
-; Configuração inicial para as interrupções
-; Entrada: Não tem
-; Saída: Não tem
-Interrupt_config
-	;	Desabilita a interrupção
-	MOV		R0, #GPIOIS_PORT_L_BASE_R
-	ADD		R0, #GPIOIM_OFFSET
-	MOV		R1, #0x00
-	STR		R1, [R0]
-	
-	MOV		R0, #GPIOIS_PORT_M_BASE_R
-	ADD		R0, #GPIOIM_OFFSET
-	MOV		R1, #0x00
-	STR		R1, [R0]
-	
-;		Configura tipo de interrupção
-	;GPIOBE
-	MOV		R0, #GPIOIS_PORT_L_BASE_R
-	ADD		R0, #GPIOIBE_OFFSET
-	MOV		R1, #GPIOIBE_VALUE
-	STR		R1, [R0]
-	
-	MOV		R0, #GPIOIS_PORT_M_BASE_R
-	ADD		R0, #GPIOIBE_OFFSET
-	MOV		R1, #GPIOIBE_VALUE
-	STR		R1, [R0]
-	
-	;GPIOIEV
-	MOV		R0, #GPIOIS_PORT_L_BASE_R
-	ADD		R0, #GPIOIEV_OFFSET
-	MOV		R1, #GPIOIEV_VALUE
-	STR		R1, [R0]
-	
-	MOV		R0, #GPIOIS_PORT_M_BASE_R
-	ADD		R0, #GPIOIEV_OFFSET
-	MOV		R1, #GPIOIEV_VALUE
-	STR		R1, [R0]
-	
-	;GPIOICR
-	MOV		R0, #GPIOIS_PORT_L_BASE_R
-	ADD		R0, #GPIOICR_OFFSET
-	MOV		R1, #GPIOICR_VALUE
-	STR		R1, [R0]
-	
-	MOV		R0, #GPIOIS_PORT_M_BASE_R
-	ADD		R0, #GPIOICR_OFFSET
-	MOV		R1, #GPIOICR_VALUE
-	STR		R1, [R0]
-	
-	;	Habilita a interrupção
-	MOV		R0, #GPIOIS_PORT_L_BASE_R
-	ADD		R0, #GPIOIM_OFFSET
-	MOV		R1, #0x01
-	STR		R1, [R0]
-	
-	MOV		R0, #GPIOIS_PORT_M_BASE_R
-	ADD		R0, #GPIOIM_OFFSET
-	MOV		R1, #0x01
-	STR		R1, [R0]
-	
-	;	Habilita a interrupção no NVIC
-	MOV		R0, #BASE_REGISTERS
-	ADD		R0, #NVIC_REG6_EN2_OFFSET
-	MOV		R1, #NVIC_INTERRUPT_NUMBER_53
-	STR		R1, [R0]
-	
-	MOV		R0, #BASE_REGISTERS
-	ADD		R0, #NVIC_REG6_EN3_OFFSET
-	MOV		R1, #NVIC_INTERRUPT_NUMBER_72
-	STR		R1, [R0]
-	
-	;	Seta a prioridade da interrupção
-	MOV		R0, #BASE_REGISTERS
-	ADD		R0, #PRI13_OFFSET
-	mov		R1, #PRI13_VALUE
-	STR		R1, [R0]
-	
-	MOV		R0, #BASE_REGISTERS
-	ADD		R0, #PRI18_OFFSET
-	mov		R1, #PRI18_VALUE
-	STR		R1, [R0]
 
 ; -------------------------------------------------------------------------------
 ; -------------------------------Funções-----------------------------------------
@@ -560,6 +496,15 @@ LCD_Reset
 			POP		{LR}
 			POP		{R0,R1,R2,R3};
 			BX		LR
+
+;---------------------------------------------------------------
+;------	Read_Keyboard	----------------------------------------
+; Função para ler as teclas pressionadas
+; Entrada: Não tem
+; Saída:
+; Modifica: Nada
+Read_Keyboard
+	
 
 	ALIGN
 	END
