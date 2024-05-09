@@ -20,8 +20,20 @@
         AREA    |.text|, CODE, READONLY, ALIGN=2
 		
 ; constante de strings		
-MSG_COFRE_ABERTO		DCB			"  Cofre aberto  ",0 ; essa string tem 16 caracteres
-MSG_NOVA_SENHA			DCB			"  Nova senha:   ",0
+MSG_STATE_01_ROW_01		DCB			"Cofre Aberto    ",0
+MSG_STATE_01_ROW_02		DCB			"Nova Senha:     ",0
+MSG_STATE_02_ROW_01		DCB			"Cofre Fechando  ",0
+MSG_STATE_02_ROW_02		DCB			"                ",0
+MSG_STATE_03_ROW_01		DCB			"Cofre Fechado   ",0
+MSG_STATE_03_ROW_02		DCB			"                ",0
+MSG_STATE_04_ROW_01		DCB			"Cofre Abrindo   ",0
+MSG_STATE_04_ROW_02		DCB			"                ",0
+MSG_STATE_05_ROW_01		DCB			"Cofre Travado   ",0
+MSG_STATE_05_ROW_02		DCB			"                ",0
+MSG_STATE_06_ROW_01		DCB			"Nova SenhaMestre",0
+MSG_STATE_06_ROW_02		DCB			"digite:         ",0
+MSG_STATE_07_ROW_01		DCB			"Digite a Senha  ",0
+MSG_STATE_07_ROW_02		DCB			"Mestre:         ",0
 
 
 		; Se alguma função do arquivo for chamada em outro arquivo	
@@ -94,10 +106,17 @@ State_5_lcd								;“Cofre Travado”
 	MOV		R11,R12						;Atualizo estado anterior
 	B		Main
 State_6_lcd								;"Nova Senha Mestre"
+	CMP		R12, #6
+	BNE		State_7_lcd
 	BL		State_6_exe
-	B		Main						;
+	B		Main		
+State_7_lcd
+	CMP		R12, #7
+	BNE		Main
+	BL		State_7_exe
+	B		Main
 ; --------------------------Funções-----------------------------------
-;------------trasition_state------------
+;------------Satate_Transition_Machine------------
 ; Função com objetivo de controlar as transições de estados do cofre
 ; Entrada: R5, R6, R7, R8, R9, R10, R12
 ; Saída: Não tem
@@ -211,12 +230,203 @@ State_7
 Invalid_MasterPassword
 End_Machine
 	BX		LR							;retorno State_Transition_Machine
-	
+;------------State_1_exe------------
+; Função para imprimir no LCD o Estado 1 do Cofre
+; Entrada: Não Tem 
+; Saída: Não Tem
+; Modifica: Nada
+State_1_exe
+	PUSH	{R0}
+	PUSH	{LR}
+	BL		LCD_Reset
+	POP		{LR}
+	PUSH	{LR}
+	LDR		R0, =MSG_STATE_01_ROW_01
+	BL		LCD_Write_String
+	POP		{LR}
+	PUSH	{LR}
+	MOV		R0, #0xC0 
+	BL		LCD_Move_Cursor
+	POP		{LR}
+	PUSH	{LR}
+	LDR		R0, =MSG_STATE_01_ROW_02
+	BL		LCD_Write_String
+	POP		{LR}
+	POP		{R0}
+	BX		LR
+;------------State_2_exe------------
+; Função para imprimir no LCD o Estado 2 do Cofre
+; Entrada: Não Tem 
+; Saída: Não Tem
+; Modifica: Nada
+State_2_exe
+	PUSH	{R0}
+	PUSH	{LR}
+	BL		LCD_Reset
+	POP		{LR}
+	PUSH	{LR}
+	LDR		R0, =MSG_STATE_02_ROW_01
+	BL		LCD_Write_String
+	POP		{LR}
+	PUSH	{LR}
+	MOV		R0, #0xC0 
+	BL		LCD_Move_Cursor
+	POP		{LR}
+	PUSH	{LR}
+	LDR		R0, =MSG_STATE_02_ROW_02
+	BL		LCD_Write_String
+	POP		{LR}
+	POP		{R0}
+	BX		LR
+;------------State_3_exe------------
+; Função para imprimir no LCD o Estado 3 do Cofre
+; Entrada: Não Tem 
+; Saída: Não Tem
+; Modifica: Nada
+State_3_exe
+	PUSH	{R0}
+	PUSH	{LR}
+	BL		LCD_Reset
+	POP		{LR}
+	PUSH	{LR}
+	LDR		R0, =MSG_STATE_03_ROW_01
+	BL		LCD_Write_String
+	POP		{LR}
+	PUSH	{LR}
+	MOV		R0, #0xC0 
+	BL		LCD_Move_Cursor
+	POP		{LR}
+	PUSH	{LR}
+	LDR		R0, =MSG_STATE_03_ROW_02
+	BL		LCD_Write_String
+	POP		{LR}
+	POP		{R0}
+	BX		LR
+;------------State_4_exe------------
+; Função para imprimir no LCD o Estado 4 do Cofre
+; Entrada: Não Tem 
+; Saída: Não Tem
+; Modifica: Nada
+State_4_exe
+	PUSH	{R0}
+	PUSH	{LR}
+	BL		LCD_Reset
+	POP		{LR}
+	PUSH	{LR}
+	LDR		R0, =MSG_STATE_04_ROW_01
+	BL		LCD_Write_String
+	POP		{LR}
+	PUSH	{LR}
+	MOV		R0, #0xC0 
+	BL		LCD_Move_Cursor
+	POP		{LR}
+	PUSH	{LR}
+	LDR		R0, =MSG_STATE_04_ROW_02
+	BL		LCD_Write_String
+	POP		{LR}
+	POP		{R0}
+	BX		LR
+;------------State_5_exe------------
+; Função para imprimir no LCD o Estado 5 do Cofre
+; Entrada: Não Tem 
+; Saída: Não Tem
+; Modifica: Nada
+State_5_exe
+	PUSH	{R0}
+	PUSH	{LR}
+	BL		LCD_Reset
+	POP		{LR}
+	PUSH	{LR}
+	LDR		R0, =MSG_STATE_05_ROW_01
+	BL		LCD_Write_String
+	POP		{LR}
+	PUSH	{LR}
+	MOV		R0, #0xC0 
+	BL		LCD_Move_Cursor
+	POP		{LR}
+	PUSH	{LR}
+	LDR		R0, =MSG_STATE_05_ROW_02
+	BL		LCD_Write_String
+	POP		{LR}
+	POP		{R0}
+	BX		LR
+;------------State_6_exe------------
+; Função para imprimir no LCD o Estado 6 do Cofre
+; Entrada: Não Tem 
+; Saída: Não Tem
+; Modifica: Nada
+State_6_exe
+	PUSH	{R0}
+	PUSH	{LR}
+	BL		LCD_Reset
+	POP		{LR}
+	PUSH	{LR}
+	LDR		R0, =MSG_STATE_06_ROW_01
+	BL		LCD_Write_String
+	POP		{LR}
+	PUSH	{LR}
+	MOV		R0, #0xC0 
+	BL		LCD_Move_Cursor
+	POP		{LR}
+	PUSH	{LR}
+	LDR		R0, =MSG_STATE_06_ROW_02
+	BL		LCD_Write_String
+	POP		{LR}
+	POP		{R0}
+	BX		LR
+;------------State_7_exe------------
+; Função para imprimir no LCD o Estado 7 do Cofre
+; Entrada: Não Tem 
+; Saída: Não Tem
+; Modifica: Nada
+State_7_exe
+	PUSH	{R0}
+	PUSH	{LR}
+	BL		LCD_Reset
+	POP		{LR}
+	PUSH	{LR}
+	LDR		R0, =MSG_STATE_07_ROW_01
+	BL		LCD_Write_String
+	POP		{LR}
+	PUSH	{LR}
+	MOV		R0, #0xC0 
+	BL		LCD_Move_Cursor
+	POP		{LR}
+	PUSH	{LR}
+	LDR		R0, =MSG_STATE_07_ROW_02
+	BL		LCD_Write_String
+	POP		{LR}
+	POP		{R0}
+	BX		LR
 ; Funções a serem feitas:
-; CheckSavePassword				; Checar o password tendo como retorno R0 como flag
-; CheckPassword					; Verifico se o Password esta correto ], caso contrario incremento R10 ou nada se '#' n ter sido pressionado. Usar R0 se a senha foi digita certa
-; CheckNewMasterPassword		; Verifica se o Password digitado é valido e retorna 1 se Checagem for valida
-; CheckMasterPassword			; Verifica se MasterPassaword é valido e se sim retorna R0=1 se Não retorna R0=0
+;------------CheckNewPassword------------
+; Função para checar o password é valido
+; Entrada: R5, R6
+; Saída: R0(0 = password invalido ou nao sem  '#' / 1 = para password válido)
+; Modifica: R9(Password do usuário)
+CheckNewPassword
+	BX		LR
+;------------CheckPassword------------
+; Função verificar se o Password esta correto, caso contrario incremento R10 ou nada se '#' n ter sido pressionado. Usar R0 se a senha foi digita certa
+; Entrada: R5, R6, R9
+; Saída: R0(0 = password invalido ou nao sem  '#' / 1 = para password válido)
+; Modifica: 
+CheckPassword
+	BX		LR
+;------------CheckNewMasterPassword------------
+; Função verificar se o Password digitado é valido e retorna 1 se Checagem for valida se for salva tbm no endereço MASTERPASSWORD
+; Entrada: R5, R6
+; Saída: R0(0 = password invalido ou nao sem  '#' / 1 = para password válido)
+; Modifica: 
+CheckNewMasterPassword
+	BX		LR
+;------------CheckMasterPassword------------
+; Função verificar se MasterPassaword é valido e se sim retorna R0=1 se Não retorna R0=0
+; Entrada: R5, R6
+; Saída: R0(0 = password invalido ou nao sem  '#' / 1 = para password válido)
+; Modifica: 
+CheckMasterPassword
+	BX		LR
 ;--------------------------------------------------------------------------------
 Fim
 	NOP;

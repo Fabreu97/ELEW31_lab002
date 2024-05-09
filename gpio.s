@@ -148,6 +148,9 @@ GPIO_PORTQ               	EQU    	2_100000000000000
 		EXPORT	LCD_Write_String
 		EXPORT	LCD_Move_Cursor
 		EXPORT	LCD_Reset
+		EXPORT	LCD_Command
+		EXPORT	ReadPortJ
+		EXPORT	PortNOutput
 ; -------------------------------------------------------------------------------
 		IMPORT	SysTick_Wait1ms
 		IMPORT	SysTick_Wait1us
@@ -222,7 +225,7 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
 			STRB	R1, [R0]
 			
 			LDR		R0, =GPIO_PORTJ_AHB_DIR_R
-			MOV		R1, #2_11						;J1~J0
+			MOV		R1, #2_00						;J1~J0
 			STRB	R1, [R0]
 			
 			LDR		R0, =GPIO_PORTK_DIR_R
@@ -334,12 +337,25 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
 ; -------------------------------------------------------------------------------
 ; -------------------------------Funções-----------------------------------------
 ; -------------------------------------------------------------------------------
+;------------ReadPortJ------------
+; Função de inicialização do LCD
+; Entrada: Não tem
+; Saída: R0
+; Modifica: R0, R1, R2, R3
+ReadPortJ
+			LDR		R1, =GPIO_PORTJ_AHB_DATA_R
+			LDRB	R0, [R1];
+			BX		LR		
+
+PortNOutput
+			LDR		R1, =GPIO_PORTN_DATA_R
+			STRB	R0, [R1]
+			BX		LR	
 ;------------LCD_Init------------
 ; Função de inicialização do LCD
 ; Entrada: Não tem
 ; Saída: Não tem
 ; Modifica: R0, R1, R2, R3
-
 LCD_Init
 			LDR		R2, =GPIO_PORTK_DATA_R
 			LDR		R3,	=GPIO_PORTM_DATA_R
@@ -510,9 +526,9 @@ LCD_Setup_Write
 ;---------------------------------------------------------------
 ;------------------LCD_Move_Cursor------------------------------
 ; Função para levar o curso do LCD para o Inicio
-; Entrada: R0
+; Entrada: R0(Posição do Cursor irá ficar)
 ; Saída: Não tem
-; Modifica: R0
+; Modifica: Nada
 LCD_Move_Cursor
 			PUSH	{R0,R1,R2,R3}
 			LDR		R2, =GPIO_PORTK_DATA_R
@@ -557,6 +573,29 @@ LCD_Reset
 			POP		{LR}
 			POP		{R0,R1,R2,R3};
 			BX		LR
-
+;---------------------------------------------------------------
+;------------------LCD_Command------------------------------
+; Função para executar um comando que necessite 40us para o LCD executar
+; Entrada: R0
+; Saída: Não tem
+; Modifica: Nada
+LCD_Command
+			PUSH	{R0,R1,R2,R3}
+			LDR		R2, =GPIO_PORTK_DATA_R
+			LDR		R3,	=GPIO_PORTM_DATA_R
+			; 1. Escrevendo o Comando 0x01 -> Resetar
+			MOV 	R1, R0;					
+			STRB	R1, [R2];
+			; 2. Habilitar os pinos EN R/W RS (M2~M0)
+			PUSH	{LR}
+			BL		LCD_Inst_Escr_Habi
+			POP		{LR}
+			; 3. Desabilitar EN pelo tempo necessário do comando
+			PUSH	{LR}
+			MOV		R0, #40;
+			BL		LCD_DESABLE_TIME_COMAND
+			POP		{LR}
+			POP		{R0,R1,R2,R3};
+			BX		LR
 	ALIGN
 	END
