@@ -40,6 +40,7 @@ MSG_NOVA_SENHA			DCB			"  Nova senha:   ",0
 		IMPORT	LCD_Write_String
 		IMPORT	LCD_Move_Cursor
 		IMPORT	LCD_Reset
+		IMPORT	Read_Keyboard
 
 ; -------------------------------------------------------------------------------
 Start  		
@@ -57,6 +58,7 @@ Start
 	BL		LCD_Move_Cursor
 	MOV		R0, #'*'
 	BL		LCD_Write_Character			;Escreve um caracter na posição R0 do LCD
+	BL		Read_Keyboard
 	;BL		LCD_Reset;					;Limpa a tela do LCD e move o cursor para a primeira linha no inicio
 	
 ; -------------------------------------------------------------------------------

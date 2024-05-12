@@ -125,6 +125,7 @@ GPIO_PORTL				EQU	2_000010000000000
 		EXPORT	LCD_Write_String
 		EXPORT	LCD_Move_Cursor
 		EXPORT	LCD_Reset
+		EXPORT	Read_Keyboard
 ; -------------------------------------------------------------------------------
 		IMPORT	SysTick_Wait1ms
 		IMPORT	SysTick_Wait1us
@@ -181,7 +182,7 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
             STR     R1, [R0]                        ;Guarda no registrador PCTL da porta N da memória
 ; 4. DIR para 0 se for entrada, 1 se for saída
 			LDR		R0, =GPIO_PORTJ_AHB_DIR_R
-			MOV		R1, #2_00000011						;J1~J0
+			MOV		R1, #2_00000011					;J1~J0
 			STRB	R1, [R0]
 			
 			LDR		R0, =GPIO_PORTK_DIR_R
@@ -193,11 +194,11 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
 			STRB	R1, [R0]
 			
             LDR     R0, =GPIO_PORTN_DIR_R			;Carrega o R0 com o endereço do DIR para a porta N
-			MOV     R1, #2_00000011						;PN1 PN0
+			MOV     R1, #2_00000011					;PN0, PN1
             STRB    R1, [R0]						;Guarda no registrador
 		
-            LDR     R0, =GPIO_PORTL_DIR_R			;Carrega o R0 com o endereço do DIR para a porta N
-			MOV     R1, #2_00000000					;PN1 PN0
+            LDR     R0, =GPIO_PORTL_DIR_R			;Carrega o R0 com o endereço do DIR para a porta L
+			MOV     R1, #2_00000000					;PL0 ~ PL3 usados pelo teclado
             STRB    R1, [R0]						;Guarda no registrador
 			; O certo era verificar os outros bits da PJ para não transformar entradas em saídas desnecessárias
 ; 5. Limpar os bits AFSEL para 0 para selecionar GPIO 
@@ -504,7 +505,119 @@ LCD_Reset
 ; Saída:
 ; Modifica: Nada
 Read_Keyboard
+	MOV		R2, #2_10001111				;PM7 como saída. PM6, PM5 e PM4 como entrada
+	PUSH	{LR}
+	BL		Read_Keyboard_Line
+	POP		{LR}
+	CMP		R1, #0x00
+	MOV		R2, #0x04
+	BXNE	LR
 	
+	MOV		R2, #2_01001111				;PM6 como saída. PM7, PM5 e PM4 como entrada
+	PUSH	{LR}
+	BL		Read_Keyboard_Line
+	POP		{LR}
+	CMP		R1, #0x00
+	MOV		R2, #0x03
+	BXNE	LR
+	
+	MOV		R2, #2_00101111				;PM5 como saída. PM7, PM6 e PM4 como entrada
+	PUSH	{LR}
+	BL		Read_Keyboard_Line
+	POP		{LR}
+	CMP		R1, #0x00
+	MOV		R2, #0x02
+	BXNE	LR
+	
+	MOV		R2, #2_00011111				;PM4 como saída. PM7, PM6 e PM5 como entrada
+	PUSH	{LR}
+	BL		Read_Keyboard_Line
+	POP		{LR}
+	CMP		R1, #0x00
+	MOV		R2, #0x04
+	BXNE	LR
+	
+	BX		LR
+
+;---------------------------------------------------------------
+;------	Read_Keyboard_Line	------------------------------------
+; Altera as portas M e verifica as linhas
+; Entrada: Não tem
+; Saída:
+; Modifica: Nada
+Read_Keyboard_Line
+	LDR		R0, =GPIO_PORTM_DIR_R
+	LDR		R1, [R0]
+	AND		R1, R2
+	STR		R1, [R0]
+	
+	PUSH	{LR}
+	BL		PortL_Input
+	POP		{LR}
+	
+	CMP		R0, #0x00
+	PUSH	{LR}
+	BLNE	Read_Line
+	POP		{LR}
+	
+	BX		LR
+
+;---------------------------------------------------------------
+;------	Read_Line	--------------------------------------------
+; Função para ler as linhas pressionadas
+; Entrada: Não tem
+; Saída: R1 -> Linha pressionada
+; Modifica: Nada
+Read_Line
+	MOV		R1, R0
+	AND		R1, #2_00001110
+	CMP		R1, #0x00
+	BEQ		Line_2
+	MOV		R1, #0x01
+	BX		LR
+
+Line_2
+	MOV		R1, R0
+	AND		R1, #2_00001101
+	CMP		R1, #0x00
+	BEQ		Line_3
+	MOV		R1, #0x02
+	BX		LR
+
+Line_3
+	MOV		R1, R0
+	AND		R1, #2_00001011
+	CMP		R1, #0x00
+	BEQ		Line_4
+	MOV		R1, #0x03
+	BX		LR
+
+Line_4
+	MOV		R1, R0
+	AND		R1, #2_00000111
+	CMP		R1, #0x00
+	BXEQ	LR
+	MOV		R1, #0x04
+	BX		LR
+
+; -------------------------------------------------------------------------------
+; Função PortL_Input
+; Parâmetro de entrada: Não tem
+; Parâmetro de saída: R0 --> o valor da leitura
+PortL_Input
+	LDR		R1, =GPIO_PORTL_DATA_R			;Carrega o valor do offset do data register
+	LDR		R0, [R1]						;Lê no barramento de dados dos pinos [J0]
+	AND		R0, #2_00001111					;Apenas os pinos PL0, PL1, PL2 e PL3
+	BX 		LR								;Retorno
+
+;---------------------------------------------------------------
+;------	Decode_Char	--------------------------------------------
+; Função para ler as linhas pressionadas
+; Entrada: Não tem
+; Saída: R1 -> Linha pressionada
+; Modifica: Nada
+Decode_Char
+	BX		LR
 
 	ALIGN
 	END
