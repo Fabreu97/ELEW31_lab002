@@ -224,6 +224,10 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
 			MOV		R1,	#2_11111111					;K7~K0
 			STRB	R1,[R0]
 			
+			LDR		R0, =GPIO_PORTL_DEN_R			;Carrega o endereço do DEN
+			MOV		R1,	#2_00001111					;M7~M4 ; M2~M0
+			STRB	R1,[R0]
+			
 			LDR		R0, =GPIO_PORTM_DEN_R			;Carrega o endereço do DEN
 			MOV		R1,	#2_11110111					;M7~M4 ; M2~M0
 			STRB	R1,[R0]
@@ -232,13 +236,17 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
             MOV     R1, #2_00000011                 ;N1 N0
             STRB    R1, [R0]						;Escreve no registrador da memória funcionalidade digital
 ; 7. Para habilitar resistor de pull-up interno, setar PUR para 1
-			LDR     R0, =GPIO_PORTJ_AHB_PUR_R			;Carrega o endereço do PUR para a porta J
-			MOV     R1, #2_11							;Habilitar funcionalidade digital de resistor de pull-up 
-            STRB    R1, [R0]							;Escreve no registrador da memória do resistor de pull-up
+			LDR     R0, =GPIO_PORTJ_AHB_PUR_R		;Carrega o endereço do PUR para a porta J
+			MOV     R1, #2_11						;Habilitar funcionalidade digital de resistor de pull-up 
+            STRB    R1, [R0]						;Escreve no registrador da memória do resistor de pull-up
 			
-			LDR     R0, =GPIO_PORTL_PUR_R			;Carrega o endereço do PUR para a porta J
-			MOV     R1, #2_00001111							;Habilitar funcionalidade digital de resistor de pull-up 
-            STRB    R1, [R0]							;Escreve no registrador da memória do resistor de pull-up
+			LDR     R0, =GPIO_PORTL_PUR_R			;Carrega o endereço do PUR para a porta L
+			MOV     R1, #2_00001111					;Habilitar funcionalidade digital de resistor de pull-up 
+            STRB    R1, [R0]						;Escreve no registrador da memória do resistor de pull-up
+			
+			LDR     R0, =GPIO_PORTM_PUR_R			;Carrega o endereço do PUR para a porta M
+			MOV     R1, #2_11110000					;Habilitar funcionalidade digital de resistor de pull-up 
+            STRB    R1, [R0]						;Escreve no registrador da memória do resistor de pull-up
 ; 8. Desabilitar as configurações dos registradores GPIOIM
 			LDR		R0, =GPIO_PORTJ_AHB_IM_R
 			MOV		R1, #2_00;
@@ -502,7 +510,7 @@ LCD_Reset
 ;------	Read_Keyboard	----------------------------------------
 ; Função para ler as teclas pressionadas
 ; Entrada: Não tem
-; Saída:
+; Saída: R2 -> coluna pressionada
 ; Modifica: Nada
 Read_Keyboard
 	MOV		R2, #2_10001111				;PM7 como saída. PM6, PM5 e PM4 como entrada
@@ -535,7 +543,7 @@ Read_Keyboard
 	POP		{LR}
 	CMP		R1, #0x00
 	MOV		R2, #0x04
-	BXNE	LR
+	;BXNE	LR
 	
 	BX		LR
 
@@ -550,16 +558,27 @@ Read_Keyboard_Line
 	LDR		R1, [R0]
 	AND		R1, R2
 	STR		R1, [R0]
+	LDR		R0, =GPIO_PORTM_DATA_R
+	LDR		R3, [R0]
+	MOV		R3, #0x00
+	STR		R3, [R0]
 	
 	PUSH	{LR}
 	BL		PortL_Input
 	POP		{LR}
 	
-	CMP		R0, #0x00
+	CMP		R0, #0x0f
 	PUSH	{LR}
 	BLNE	Read_Line
 	POP		{LR}
-	
+	CMP		R0, #0x0f
+	PUSH	{LR}
+	BLEQ	Not_Line
+	POP		{LR}	
+	BX		LR
+
+Not_Line
+	MOV		R1, #0x00
 	BX		LR
 
 ;---------------------------------------------------------------
@@ -570,34 +589,35 @@ Read_Keyboard_Line
 ; Modifica: Nada
 Read_Line
 	MOV		R1, R0
-	AND		R1, #2_00001110
+	AND		R1, #2_00000001
 	CMP		R1, #0x00
-	BEQ		Line_2
+	;BEQ		Line_2
 	MOV		R1, #0x01
-	BX		LR
+	BXEQ	LR
 
 Line_2
 	MOV		R1, R0
-	AND		R1, #2_00001101
+	AND		R1, #2_00000010
 	CMP		R1, #0x00
-	BEQ		Line_3
+	;BEQ		Line_3
 	MOV		R1, #0x02
-	BX		LR
+	BXEQ	LR
 
 Line_3
 	MOV		R1, R0
-	AND		R1, #2_00001011
+	AND		R1, #2_00000100
 	CMP		R1, #0x00
-	BEQ		Line_4
+	;BEQ		Line_4
 	MOV		R1, #0x03
-	BX		LR
+	BXEQ	LR
 
 Line_4
 	MOV		R1, R0
-	AND		R1, #2_00000111
+	AND		R1, #2_00001000
 	CMP		R1, #0x00
-	BXEQ	LR
 	MOV		R1, #0x04
+	BXEQ	LR
+	MOV		R1, #0x00
 	BX		LR
 
 ; -------------------------------------------------------------------------------
@@ -606,8 +626,8 @@ Line_4
 ; Parâmetro de saída: R0 --> o valor da leitura
 PortL_Input
 	LDR		R1, =GPIO_PORTL_DATA_R			;Carrega o valor do offset do data register
-	LDR		R0, [R1]						;Lê no barramento de dados dos pinos [J0]
-	AND		R0, #2_00001111					;Apenas os pinos PL0, PL1, PL2 e PL3
+	LDR		R0, [R1]						;Lê no barramento de dados dos pinos
+	;AND		R0, #2_11110000				;Apenas os pinos PL0, PL1, PL2 e PL3
 	BX 		LR								;Retorno
 
 ;---------------------------------------------------------------
@@ -617,6 +637,7 @@ PortL_Input
 ; Saída: R1 -> Linha pressionada
 ; Modifica: Nada
 Decode_Char
+	NOP
 	BX		LR
 
 	ALIGN

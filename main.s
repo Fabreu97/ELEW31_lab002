@@ -58,12 +58,13 @@ Start
 	BL		LCD_Move_Cursor
 	MOV		R0, #'*'
 	BL		LCD_Write_Character			;Escreve um caracter na posição R0 do LCD
-	BL		Read_Keyboard
 	;BL		LCD_Reset;					;Limpa a tela do LCD e move o cursor para a primeira linha no inicio
 	
 ; -------------------------------------------------------------------------------
 ; Função main()
 Main
+	BL		Read_Keyboard
+	B 		Main
 	
 ;--------------------------------------------------------------------------------
 Fim
