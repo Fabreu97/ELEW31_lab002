@@ -190,7 +190,7 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
 			STRB	R1, [R0]
 			
 			LDR		R0, =GPIO_PORTM_DIR_R
-			MOV		R1, #2_11110111					;M7~M4 USADO NO TECLADO ; M2~M0 USADO NO LCD 
+			MOV		R1, #2_00000111					;M7~M4 USADO NO TECLADO ; M2~M0 USADO NO LCD 
 			STRB	R1, [R0]
 			
             LDR     R0, =GPIO_PORTN_DIR_R			;Carrega o R0 com o endereço do DIR para a porta N
@@ -513,7 +513,8 @@ LCD_Reset
 ; Saída: R2 -> coluna pressionada
 ; Modifica: Nada
 Read_Keyboard
-	MOV		R2, #2_10001111				;PM7 como saída. PM6, PM5 e PM4 como entrada
+	MOV		R2, #2_00001111				
+	MOV		R4, #2_10000000				;PM7 como saída. PM6, PM5 e PM4 como entrada
 	PUSH	{LR}
 	BL		Read_Keyboard_Line
 	POP		{LR}
@@ -521,7 +522,7 @@ Read_Keyboard
 	MOV		R2, #0x04
 	BXNE	LR
 	
-	MOV		R2, #2_01001111				;PM6 como saída. PM7, PM5 e PM4 como entrada
+	MOV		R4, #2_01000000				;PM6 como saída. PM7, PM5 e PM4 como entrada
 	PUSH	{LR}
 	BL		Read_Keyboard_Line
 	POP		{LR}
@@ -529,7 +530,7 @@ Read_Keyboard
 	MOV		R2, #0x03
 	BXNE	LR
 	
-	MOV		R2, #2_00101111				;PM5 como saída. PM7, PM6 e PM4 como entrada
+	MOV		R4, #2_00100000				;PM5 como saída. PM7, PM6 e PM4 como entrada
 	PUSH	{LR}
 	BL		Read_Keyboard_Line
 	POP		{LR}
@@ -537,7 +538,7 @@ Read_Keyboard
 	MOV		R2, #0x02
 	BXNE	LR
 	
-	MOV		R2, #2_00011111				;PM4 como saída. PM7, PM6 e PM5 como entrada
+	MOV		R4, #2_00010000				;PM4 como saída. PM7, PM6 e PM5 como entrada
 	PUSH	{LR}
 	BL		Read_Keyboard_Line
 	POP		{LR}
@@ -557,6 +558,7 @@ Read_Keyboard_Line
 	LDR		R0, =GPIO_PORTM_DIR_R
 	LDR		R1, [R0]
 	AND		R1, R2
+	ORR		R1, R4
 	STR		R1, [R0]
 	LDR		R0, =GPIO_PORTM_DATA_R
 	LDR		R3, [R0]
