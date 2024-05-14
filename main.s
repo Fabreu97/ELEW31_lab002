@@ -45,21 +45,23 @@ MSG_STATE_07_ROW_02		DCB			"Mestre:         ",0
 									; função <func>
 		IMPORT  PLL_Init
 		IMPORT  SysTick_Init
-		IMPORT  SysTick_Wait1ms			
+		IMPORT  SysTick_Wait1ms
 		IMPORT  GPIO_Init
 		IMPORT	LCD_Init
 		IMPORT	LCD_Write_Character
 		IMPORT	LCD_Write_String
 		IMPORT	LCD_Move_Cursor
 		IMPORT	LCD_Reset
+		IMPORT	Read_Keyboard
+		IMPORT	Decode_Char
 
 ; -------------------------------------------------------------------------------
 Start  		
 	BL 		PLL_Init                  	;Chama a subrotina para alterar o clock do microcontrolador para 80MHz
 	BL 		SysTick_Init
 	BL 		GPIO_Init                 	;Chama a subrotina que inicializa os GPIO
-	BL		LCD_Init					;Chama a subrotina que inicializa o LCD
-	MOV		R5, #0						;registrador de confirmação do envio da senha
+	BL		LCD_Init
+		MOV		R5, #0						;registrador de confirmação do envio da senha
 	MOV		R6, #0						;password que o usuário digito	
 	MOV		R7, #0						;SW1 Acionado
 	MOV		R8, #0						;SW2 Acionado
@@ -426,7 +428,7 @@ CheckNewMasterPassword
 ; Saída: R0(0 = password invalido ou nao sem  '#' / 1 = para password válido)
 ; Modifica: 
 CheckMasterPassword
-	BX		LR
+	BX		LR					;Chama a subrotina que inicializa o LCD
 ;--------------------------------------------------------------------------------
 Fim
 	NOP;
