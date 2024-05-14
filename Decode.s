@@ -162,14 +162,12 @@ PortL_Input
 ; Saída: R1 -> Linha pressionada, R2 -> Coluna pressionada
 ; Modifica: Nada
 Decode_Char
-	MOVT	R0, #0xffff
-	MOV		R0, #0xff00
 	CMP		R5, #1
 	ITTTE	EQ
 	MOVTEQ	R6, #0x0000
 	MOVEQ	R6, #0x0000
 	MOVEQ	R5, #0
-	ANDNE	R6, R0
+	MOVNE	R0, #0xA
 
 ; Coluna 1 =====================================
 Decode_Char_Coluna_1

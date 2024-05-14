@@ -61,7 +61,7 @@ Start
 	BL 		SysTick_Init
 	BL 		GPIO_Init                 	;Chama a subrotina que inicializa os GPIO
 	BL		LCD_Init
-		MOV		R5, #0						;registrador de confirmação do envio da senha
+	MOV		R5, #0						;registrador de confirmação do envio da senha
 	MOV		R6, #0						;password que o usuário digito	
 	MOV		R7, #0						;SW1 Acionado
 	MOV		R8, #0						;SW2 Acionado
@@ -73,6 +73,10 @@ Start
 ; -------------------------------------------------------------------------------
 ; Função main()
 Main
+	BL	Read_Keyboard
+	BL	Decode_Char
+	B	Main
+
 	BL		State_Transition_Machine;	;Função de Transição de Estado
 	CMP 	R11, R12					;Comparando se o estado anterior é igual ao estado atual
 	BEQ		Main						;So sai por interrupção ou leitura
