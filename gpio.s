@@ -515,8 +515,12 @@ LCD_Reset
 ; Saída: R2 -> coluna pressionada
 ; Modifica: Nada
 Read_Keyboard
-	MOV		R1, #0x00
-	MOV		R2, #2_00001111				
+	MOV		R1, #0x0000
+	MOVT	R1, #0x0000
+	MOV		R0, #0x0000
+	MOVT	R0, #0x0000
+	MOV		R2, #2_00001111
+	
 	MOV		R4, #2_10000000				;PM7 como saída. PM6, PM5 e PM4 como entrada
 	PUSH	{LR}
 	BL		Read_Keyboard_Line
@@ -559,6 +563,7 @@ Read_Keyboard
 ; Saída:
 ; Modifica: Nada
 Read_Keyboard_Line
+	MOV		R2, #2_00001111	
 	LDR		R0, =GPIO_PORTM_DIR_R
 	LDR		R1, [R0]
 	AND		R1, R2
@@ -566,8 +571,13 @@ Read_Keyboard_Line
 	STR		R1, [R0]
 	LDR		R0, =GPIO_PORTM_DATA_R
 	LDR		R3, [R0]
-	MOV		R3, #0x00
+	AND		R3, #2_00001111
 	STR		R3, [R0]
+	
+	MOV		R0, #5
+	PUSH	{LR}
+	BL		SysTick_Wait1ms
+	POP		{LR}
 	
 	PUSH	{LR}
 	BL		PortL_Input
@@ -584,7 +594,10 @@ Read_Keyboard_Line
 	BX		LR
 
 Not_Line
-	MOV		R1, #0x00
+	MOV		R1, #0x0000
+	MOVT	R1, #0x0000
+	MOV		R0, #0x0000
+	MOVT	R0, #0x0000
 	BX		LR
 
 ;---------------------------------------------------------------
@@ -624,6 +637,7 @@ Line_4
 	MOV		R1, #0x04
 	BXEQ	LR
 	MOV		R1, #0x00
+	MOV		R2, #0x00
 	BX		LR
 
 ; -------------------------------------------------------------------------------
@@ -631,9 +645,11 @@ Line_4
 ; Parâmetro de entrada: Não tem
 ; Parâmetro de saída: R0 --> o valor da leitura
 PortL_Input
+	MOV		R0, #0x0000
+	MOVT	R0, #0x0000
 	LDR		R1, =GPIO_PORTL_DATA_R			;Carrega o valor do offset do data register
 	LDR		R0, [R1]						;Lê no barramento de dados dos pinos
-	;AND		R0, #2_11110000				;Apenas os pinos PL0, PL1, PL2 e PL3
+	AND		R0, #2_00001111
 	BX 		LR								;Retorno
 
 	ALIGN

@@ -66,7 +66,6 @@ Start
 Main
 	BL		Read_Keyboard
 	BL		Decode_Char
-	NOP
 	B 		Main
 
 ;--------------------------------------------------------------------------------
