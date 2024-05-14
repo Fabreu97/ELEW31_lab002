@@ -632,15 +632,5 @@ PortL_Input
 	;AND		R0, #2_11110000				;Apenas os pinos PL0, PL1, PL2 e PL3
 	BX 		LR								;Retorno
 
-;---------------------------------------------------------------
-;------	Decode_Char	--------------------------------------------
-; Função para ler as linhas pressionadas
-; Entrada: Não tem
-; Saída: R1 -> Linha pressionada
-; Modifica: Nada
-Decode_Char
-	NOP
-	BX		LR
-
 	ALIGN
 	END

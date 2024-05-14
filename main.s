@@ -64,8 +64,143 @@ Start
 ; Função main()
 Main
 	BL		Read_Keyboard
+	BL		Decode_Char
+	BL		LCD_Write_Character			;Escreve um caracter na posição R0 do LCD
 	B 		Main
+
+
+;---------------------------------------------------------------
+;------	Decode_Char	--------------------------------------------
+; Função para ler as linhas pressionadas
+; Entrada: Não tem
+; Saída: R1 -> Linha pressionada, R2 -> Coluna pressionada
+; Modifica: Nada
+Decode_Char
+	MOVT	R0, #0xffff
+	MOV		R0, #0xff00
+	CMP		R5, #1
+	ITTTE	EQ
+	MOVTEQ	R6, #0x0000
+	MOVEQ	R6, #0x0000
+	MOVEQ	R5, #0
+	ANDNE	R6, R0
+
+; Coluna 1 =====================================
+Decode_Char_Coluna_1
+	CMP		R2, #1
+	BNE		Decode_Char_Coluna_2
+
+Decode_Char_Coluna_1_Linha_1					;1
+	CMP		R1, #1
+	BNE		Decode_Char_Coluna_1_Linha_2
+	LSL		R6, #8
+	ORR		R6, #0x31
 	
+Decode_Char_Coluna_1_Linha_2					;4
+	CMP		R1, #2
+	BNE		Decode_Char_Coluna_1_Linha_3
+	LSL		R6, #8
+	ORR		R6, #0x34
+	
+Decode_Char_Coluna_1_Linha_3					;7
+	CMP		R1, #3
+	BNE		Decode_Char_Coluna_1_Linha_4
+	LSL		R6, #8
+	ORR		R6, #0x37
+	
+Decode_Char_Coluna_1_Linha_4					;*
+	CMP		R1, #4
+	BXNE	LR									;Se coluna == 1 e linha invalida, retorna
+	LSL		R6, #8
+	ORR		R6, #0x2a
+	
+; Coluna 2 =====================================
+Decode_Char_Coluna_2
+	CMP		R2, #2
+	BNE		Decode_Char_Coluna_3
+	
+Decode_Char_Coluna_2_Linha_1					;2
+	CMP		R1, #1
+	BNE		Decode_Char_Coluna_2_Linha_2
+	LSL		R6, #8
+	ORR		R6, #0x32
+	
+Decode_Char_Coluna_2_Linha_2					;5
+	CMP		R1, #2
+	BNE		Decode_Char_Coluna_2_Linha_3
+	LSL		R6, #8
+	ORR		R6, #0x35
+	
+Decode_Char_Coluna_2_Linha_3					;8
+	CMP		R1, #3
+	BNE		Decode_Char_Coluna_2_Linha_4
+	LSL		R6, #8
+	ORR		R6, #0x38
+	
+Decode_Char_Coluna_2_Linha_4					;0
+	CMP		R1, #4
+	BXNE	LR									;Se coluna == 2 e linha invalida, retorna
+	LSL		R6, #8
+	ORR		R6, #0x30
+	
+; Coluna 3 =====================================
+Decode_Char_Coluna_3
+	CMP		R2, #3
+	BNE		Decode_Char_Coluna_4
+	
+Decode_Char_Coluna_3_Linha_1					;3
+	CMP		R1, #1
+	BNE		Decode_Char_Coluna_3_Linha_2
+	LSL		R6, #8
+	ORR		R6, #0x33
+	
+Decode_Char_Coluna_3_Linha_2					;6
+	CMP		R1, #2
+	BNE		Decode_Char_Coluna_3_Linha_3
+	LSL		R6, #8
+	ORR		R6, #0x36
+	
+Decode_Char_Coluna_3_Linha_3					;9
+	CMP		R1, #3
+	BNE		Decode_Char_Coluna_3_Linha_4
+	LSL		R6, #8
+	ORR		R6, #0x39
+	
+Decode_Char_Coluna_3_Linha_4					;#
+	CMP		R1, #4
+	BXNE	LR									;Se coluna == 3 e linha invalida, retorna
+	MOV		R5, #1								;booleano R5 (fim da senha) = 1
+
+; Coluna 4 =====================================
+Decode_Char_Coluna_4
+	CMP		R2, #4
+	BXNE	LR
+	
+Decode_Char_Coluna_4_Linha_1					;A
+	CMP		R1, #1
+	BNE		Decode_Char_Coluna_4_Linha_2
+	LSL		R6, #8
+	ORR		R6, #0x41
+	
+Decode_Char_Coluna_4_Linha_2					;B
+	CMP		R1, #2
+	BNE		Decode_Char_Coluna_4_Linha_3
+	LSL		R6, #8
+	ORR		R6, #0x42
+	
+Decode_Char_Coluna_4_Linha_3					;C
+	CMP		R1, #3
+	BNE		Decode_Char_Coluna_4_Linha_4
+	LSL		R6, #8
+	ORR		R6, #0x43
+	
+Decode_Char_Coluna_4_Linha_4					;D
+	CMP		R1, #4
+	BXNE	LR									;Se coluna == 4 e linha invalida, retorna
+	LSL		R6, #8
+	ORR		R6, #0x44
+
+	BX		LR
 ;--------------------------------------------------------------------------------
 Fim
 	NOP;
