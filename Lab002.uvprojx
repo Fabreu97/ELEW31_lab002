@@ -403,6 +403,11 @@
               <FileType>2</FileType>
               <FilePath>.\gpio.s</FilePath>
             </File>
+            <File>
+              <FileName>Decode.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\Decode.s</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

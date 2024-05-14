@@ -129,6 +129,7 @@ GPIO_PORTL				EQU	2_000010000000000
 ; -------------------------------------------------------------------------------
 		IMPORT	SysTick_Wait1ms
 		IMPORT	SysTick_Wait1us
+		IMPORT	Decode_Char
 
 ; 1. Ativar o clock para a porta setando o bit correspondente no registrador RCGCGPIO,
 ; após isso verificar no PRGPIO se a porta está pronta para uso.
@@ -505,6 +506,7 @@ LCD_Reset
 			POP		{LR}
 			POP		{R0,R1,R2,R3};
 			BX		LR
+			
 
 ;---------------------------------------------------------------
 ;------	Read_Keyboard	----------------------------------------
@@ -513,6 +515,7 @@ LCD_Reset
 ; Saída: R2 -> coluna pressionada
 ; Modifica: Nada
 Read_Keyboard
+	MOV		R1, #0x00
 	MOV		R2, #2_00001111				
 	MOV		R4, #2_10000000				;PM7 como saída. PM6, PM5 e PM4 como entrada
 	PUSH	{LR}
@@ -543,8 +546,9 @@ Read_Keyboard
 	BL		Read_Keyboard_Line
 	POP		{LR}
 	CMP		R1, #0x00
-	MOV		R2, #0x04
-	;BXNE	LR
+	MOV		R2, #0x01
+	BXNE	LR
+	MOV		R2, #0x00
 	
 	BX		LR
 
@@ -593,7 +597,7 @@ Read_Line
 	MOV		R1, R0
 	AND		R1, #2_00000001
 	CMP		R1, #0x00
-	;BEQ		Line_2
+	BNE	Line_2
 	MOV		R1, #0x01
 	BXEQ	LR
 
@@ -601,7 +605,7 @@ Line_2
 	MOV		R1, R0
 	AND		R1, #2_00000010
 	CMP		R1, #0x00
-	;BEQ		Line_3
+	BNE	Line_3
 	MOV		R1, #0x02
 	BXEQ	LR
 
@@ -609,7 +613,7 @@ Line_3
 	MOV		R1, R0
 	AND		R1, #2_00000100
 	CMP		R1, #0x00
-	;BEQ		Line_4
+	BNE		Line_4
 	MOV		R1, #0x03
 	BXEQ	LR
 

@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\Lab002.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\Lab002.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6160001: Last Updated: Tue May 14 00:12:35 2024
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6160001: Last Updated: Tue May 14 00:46:55 2024
 <BR><P>
 <H3>Maximum Stack Usage =          0 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -16,15 +16,16 @@ Functions with no stack information
  <LI><a href="#[6b]">Start</a>
  <LI><a href="#[6c]">PLL_Init</a>
  <LI><a href="#[6d]">SysTick_Init</a>
- <LI><a href="#[75]">SysTick_Wait1ms</a>
- <LI><a href="#[74]">SysTick_Wait1us</a>
+ <LI><a href="#[76]">SysTick_Wait1ms</a>
+ <LI><a href="#[75]">SysTick_Wait1us</a>
  <LI><a href="#[6e]">GPIO_Init</a>
  <LI><a href="#[6f]">LCD_Init</a>
  <LI><a href="#[70]">LCD_Write_String</a>
  <LI><a href="#[72]">LCD_Write_Character</a>
  <LI><a href="#[71]">LCD_Move_Cursor</a>
- <LI><a href="#[76]">LCD_Reset</a>
+ <LI><a href="#[77]">LCD_Reset</a>
  <LI><a href="#[73]">Read_Keyboard</a>
+ <LI><a href="#[74]">Decode_Char</a>
 </UL>
 </UL>
 <P>
@@ -529,6 +530,7 @@ Global Symbols
 <LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LCD_Move_Cursor
 <LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LCD_Init
 <LI><a href="#[6e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_Init
+<LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Decode_Char
 </UL>
 <BR>[Called By]<UL><LI><a href="#[0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Reset_Handler
 </UL>
@@ -541,9 +543,9 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[6b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start
 </UL>
 
-<P><STRONG><a name="[75]"></a>SysTick_Wait1ms</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, utils.o(.text), UNUSED)
+<P><STRONG><a name="[76]"></a>SysTick_Wait1ms</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, utils.o(.text), UNUSED)
 
-<P><STRONG><a name="[74]"></a>SysTick_Wait1us</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, utils.o(.text))
+<P><STRONG><a name="[75]"></a>SysTick_Wait1us</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, utils.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LCD_Write_Character
 <LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LCD_Init
 </UL>
@@ -553,7 +555,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[6f]"></a>LCD_Init</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, gpio.o(.text))
-<BR><BR>[Calls]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Wait1us
+<BR><BR>[Calls]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Wait1us
 </UL>
 <BR>[Called By]<UL><LI><a href="#[6b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start
 </UL>
@@ -565,7 +567,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[72]"></a>LCD_Write_Character</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, gpio.o(.text))
-<BR><BR>[Calls]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Wait1us
+<BR><BR>[Calls]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Wait1us
 </UL>
 <BR>[Called By]<UL><LI><a href="#[70]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LCD_Write_String
 <LI><a href="#[6b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start
@@ -575,9 +577,13 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[6b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start
 </UL>
 
-<P><STRONG><a name="[76]"></a>LCD_Reset</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, gpio.o(.text), UNUSED)
+<P><STRONG><a name="[77]"></a>LCD_Reset</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, gpio.o(.text), UNUSED)
 
 <P><STRONG><a name="[73]"></a>Read_Keyboard</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, gpio.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[6b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start
+</UL>
+
+<P><STRONG><a name="[74]"></a>Decode_Char</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, decode.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[6b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start
 </UL>
 <P>
