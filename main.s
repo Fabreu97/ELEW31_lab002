@@ -68,7 +68,7 @@ Start
 	MOV		R9, #0						;Password Usuario para abrir o cofre
 	MOV		R10, #0						;Quantidade de Erros de senha
 	MOV		R11, #0						;Registrador do estado anterior
-	MOV		R12, #1						;Registrador do estado atual
+	MOV		R12, #2						;Registrador do estado atual
 	B		begin_here
 ; -------------------------------------------------------------------------------
 ; Função main()
