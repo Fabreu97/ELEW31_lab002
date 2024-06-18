@@ -36,6 +36,7 @@ MSG_STATE_07_ROW_01		DCB			"Digite a Senha  ",0
 MSG_STATE_07_ROW_02		DCB			"Mestre:         ",0
 
 USER_PASSWORD_ENTERED	DCB			"",0
+MASTERPASSWORD			DCB			"1234",0
 
 
 		; Se alguma função do arquivo for chamada em outro arquivo	
@@ -56,7 +57,9 @@ USER_PASSWORD_ENTERED	DCB			"",0
 		IMPORT	LCD_Reset
 		IMPORT	Read_Keyboard
 		IMPORT	Decode_Char
-
+; -------------------------------------------------------------------------------
+; CONSTANTES
+REACTION_TIME				EQU			150
 ; -------------------------------------------------------------------------------
 Start  		
 	BL 		PLL_Init                  	;Chama a subrotina para alterar o clock do microcontrolador para 80MHz
@@ -64,7 +67,7 @@ Start
 	BL 		GPIO_Init                 	;Chama a subrotina que inicializa os GPIO
 	BL		LCD_Init
 	MOV		R5, #0						;registrador de confirmação do envio da senha
-	MOV		R6, #0						;password que o usuário digito	
+	MOV		R6, #0						;password que o usuário digitado	
 	MOV		R7, #0						;SW1 Acionado
 	MOV		R8, #0						;SW2 Acionado
 	MOV		R9, #0						;Password Usuario para abrir o cofre
@@ -77,7 +80,7 @@ Start
 Main
 	BL		Read_Keyboard
 	BL		Decode_Char
-	MOV		R0, #150
+	MOV		R0, REACTION_TIME
 	BL		SysTick_Wait1ms
 	BL		PrintPassWord
 	BL		State_Transition_Machine;	;Função de Transição de Estado
@@ -487,12 +490,10 @@ END_ISDIGIT
 ; Saída: R0(0 = password invalido ou nao sem  '#' / 1 = para password válido)
 ; Modifica: R9(Password do usuário)
 CheckNewPassword
-	PUSH	{R1,R4}
-	MOV		R4, #0
-	
 	;Comparo se '#' foi pressionado
 	CMP		R5, #0
 	BEQ		 END_CNP
+	MOV		R5, #0
 	
 	MOV		R0, #0						;
 	AND		R0, R6, #0x000000FF			; R1 recebe caracter da senha posição 3
@@ -531,15 +532,31 @@ CheckNewPassword
 
 	MOV		R0, #1
 	MOV		R9, R6
+	MOV		R6, #0
 END_CNP
-	POP		{R1,R4}
 	BX		LR
 ;------------CheckPassword------------
 ; Função verificar se o Password esta correto, caso contrario incremento R10 ou nada se '#' n ter sido pressionado. Usar R0 se a senha foi digita certa
-; Entrada: R5, R6, R9
+; Entrada: R5, R6, R9, R10
 ; Saída: R0(0 = password invalido ou nao sem  '#' / 1 = para password válido)
-; Modifica: 
+; Modifica: R5,R6,R10
 CheckPassword
+	;Comparo se '#' foi pressionado
+	CMP		R5, #0
+	BEQ		 END_CP
+	MOV		R5, #0
+	
+	CMP		R6, R9
+	BNE		invalid_password
+correct_password_cp
+	MOV		R6, #0
+	MOV		R0, #1
+	BX		LR
+invalid_password
+	ADD		R10,R10,#1
+	MOV		R6, #0;
+	MOV		R0, #0;
+END_CP
 	BX		LR
 ;------------CheckNewMasterPassword------------
 ; Função verificar se o Password digitado é valido e retorna 1 se Checagem for valida se for salva tbm no endereço MASTERPASSWORD

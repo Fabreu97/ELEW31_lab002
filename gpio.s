@@ -8,8 +8,10 @@
 ; -------------------------------------------------------------------------------
 ; ========================
 ; Definições dos Registradores Gerais
-SYSCTL_RCGCGPIO_R	 EQU	0x400FE608
-SYSCTL_PRGPIO_R		 EQU    0x400FEA08
+SYSCTL_RCGCGPIO_R			EQU		0x400FE608
+SYSCTL_PRGPIO_R				EQU    	0x400FEA08
+NVIC_EN1_R					EQU		0xE000E104
+NVIC_PRI12_R				EQU		0xE000E430
 ; Definições dos Ports
 ;
 ; PORT A
@@ -374,7 +376,12 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
 			STRB	R1, [R0];
 			
 ; 13. Setar a prioriedade no NVIC(pág 116)  PRIx // Para a Port J o número de interrupção é 51 / deve ser x =12 
-			
+			LDR		R0, =NVIC_EN1_R
+			LDR		R2, [R0]
+			MOV		R1, #1
+			LSL		R1, R1, #19
+			ORR		R1, R1, R2
+			STR		R1, [R0]
 ; 14. Habilitar a interrupção no NVIC(pág)  ENx  // x = 1
 			BX      LR;						retorno GPIO_Init
 

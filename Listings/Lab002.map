@@ -42,7 +42,7 @@ Image Symbol Table
     RESET                                    0x00000000   Section      544  startup.o(RESET)
     $v0                                      0x00000208   Number         0  startup.o(RESET)
     MSG_STATE_01_ROW_01                      0x00000220   Data          17  main.o(.text)
-    .text                                    0x00000220   Section     1376  main.o(.text)
+    .text                                    0x00000220   Section     1412  main.o(.text)
     MSG_STATE_01_ROW_02                      0x00000231   Data          17  main.o(.text)
     MSG_STATE_02_ROW_01                      0x00000242   Data          17  main.o(.text)
     MSG_STATE_02_ROW_02                      0x00000253   Data          17  main.o(.text)
@@ -56,15 +56,15 @@ Image Symbol Table
     MSG_STATE_06_ROW_02                      0x000002db   Data          17  main.o(.text)
     MSG_STATE_07_ROW_01                      0x000002ec   Data          17  main.o(.text)
     MSG_STATE_07_ROW_02                      0x000002fd   Data          17  main.o(.text)
-    $v0                                      0x00000310   Number         0  main.o(.text)
-    $v0                                      0x00000780   Number         0  utils.o(.text)
-    .text                                    0x00000780   Section      484  utils.o(.text)
-    $v0                                      0x00000964   Number         0  gpio.o(.text)
-    .text                                    0x00000964   Section      572  gpio.o(.text)
-    $v0                                      0x00000ba0   Number         0  decode.o(.text)
-    .text                                    0x00000ba0   Section      592  decode.o(.text)
-    $v0                                      0x00000df0   Number         0  lcd.o(.text)
-    .text                                    0x00000df0   Section      444  lcd.o(.text)
+    $v0                                      0x00000314   Number         0  main.o(.text)
+    $v0                                      0x000007a4   Number         0  utils.o(.text)
+    .text                                    0x000007a4   Section      484  utils.o(.text)
+    $v0                                      0x00000988   Number         0  gpio.o(.text)
+    .text                                    0x00000988   Section      572  gpio.o(.text)
+    $v0                                      0x00000bc4   Number         0  decode.o(.text)
+    .text                                    0x00000bc4   Section      592  decode.o(.text)
+    $v0                                      0x00000e14   Number         0  lcd.o(.text)
+    .text                                    0x00000e14   Section      444  lcd.o(.text)
     StackMem                                 0x20000000   Data           0  startup.o(STACK)
     STACK                                    0x20000000   Section     1024  startup.o(STACK)
 
@@ -181,22 +181,22 @@ Image Symbol Table
     WDT_Handler                              0x0000021f   Thumb Code     0  startup.o(RESET)
     uDMA_Error                               0x0000021f   Thumb Code     0  startup.o(RESET)
     uDMA_Handler                             0x0000021f   Thumb Code     0  startup.o(RESET)
-    Start                                    0x00000311   Thumb Code     0  main.o(.text)
-    PLL_Init                                 0x00000781   Thumb Code     0  utils.o(.text)
-    SysTick_Init                             0x000008a9   Thumb Code     0  utils.o(.text)
-    SysTick_Wait1ms                          0x000008e3   Thumb Code     0  utils.o(.text)
-    SysTick_Wait1us                          0x000008f5   Thumb Code     0  utils.o(.text)
-    GPIO_Init                                0x00000965   Thumb Code     0  gpio.o(.text)
-    ReadPortJ                                0x00000ad3   Thumb Code     0  gpio.o(.text)
-    PortNOutput                              0x00000ad9   Thumb Code     0  gpio.o(.text)
-    Read_Keyboard                            0x00000ba1   Thumb Code     0  decode.o(.text)
-    Decode_Char                              0x00000ce1   Thumb Code     0  decode.o(.text)
-    LCD_Init                                 0x00000df1   Thumb Code     0  lcd.o(.text)
-    LCD_Write_String                         0x00000ecd   Thumb Code     0  lcd.o(.text)
-    LCD_Write_Character                      0x00000eed   Thumb Code     0  lcd.o(.text)
-    LCD_Move_Cursor                          0x00000f31   Thumb Code     0  lcd.o(.text)
-    LCD_Reset                                0x00000f57   Thumb Code     0  lcd.o(.text)
-    LCD_Command                              0x00000f7f   Thumb Code     0  lcd.o(.text)
+    Start                                    0x00000315   Thumb Code     0  main.o(.text)
+    PLL_Init                                 0x000007a5   Thumb Code     0  utils.o(.text)
+    SysTick_Init                             0x000008cd   Thumb Code     0  utils.o(.text)
+    SysTick_Wait1ms                          0x00000907   Thumb Code     0  utils.o(.text)
+    SysTick_Wait1us                          0x00000919   Thumb Code     0  utils.o(.text)
+    GPIO_Init                                0x00000989   Thumb Code     0  gpio.o(.text)
+    ReadPortJ                                0x00000af7   Thumb Code     0  gpio.o(.text)
+    PortNOutput                              0x00000afd   Thumb Code     0  gpio.o(.text)
+    Read_Keyboard                            0x00000bc5   Thumb Code     0  decode.o(.text)
+    Decode_Char                              0x00000d05   Thumb Code     0  decode.o(.text)
+    LCD_Init                                 0x00000e15   Thumb Code     0  lcd.o(.text)
+    LCD_Write_String                         0x00000ef1   Thumb Code     0  lcd.o(.text)
+    LCD_Write_Character                      0x00000f11   Thumb Code     0  lcd.o(.text)
+    LCD_Move_Cursor                          0x00000f55   Thumb Code     0  lcd.o(.text)
+    LCD_Reset                                0x00000f7b   Thumb Code     0  lcd.o(.text)
+    LCD_Command                              0x00000fa3   Thumb Code     0  lcd.o(.text)
 
 
 
@@ -206,26 +206,26 @@ Memory Map of the image
 
   Image Entry point : 0x00000209
 
-  Load Region LR_1 (Base: 0x00000000, Size: 0x00000fac, Max: 0xffffffff, ABSOLUTE)
+  Load Region LR_1 (Base: 0x00000000, Size: 0x00000fd0, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x00000fac, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RO (Exec base: 0x00000000, Load base: 0x00000000, Size: 0x00000fd0, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x00000000   0x00000000   0x00000220   Code   RO            9  * RESET               startup.o
-    0x00000220   0x00000220   0x00000560   Code   RO            2    .text               main.o
-    0x00000780   0x00000780   0x000001e4   Code   RO           16    .text               utils.o
-    0x00000964   0x00000964   0x0000023c   Code   RO           19    .text               gpio.o
-    0x00000ba0   0x00000ba0   0x00000250   Code   RO           22    .text               decode.o
-    0x00000df0   0x00000df0   0x000001bc   Code   RO           25    .text               lcd.o
+    0x00000220   0x00000220   0x00000584   Code   RO            2    .text               main.o
+    0x000007a4   0x000007a4   0x000001e4   Code   RO           16    .text               utils.o
+    0x00000988   0x00000988   0x0000023c   Code   RO           19    .text               gpio.o
+    0x00000bc4   0x00000bc4   0x00000250   Code   RO           22    .text               decode.o
+    0x00000e14   0x00000e14   0x000001bc   Code   RO           25    .text               lcd.o
 
 
-    Execution Region ER_RW (Exec base: 0x20000000, Load base: 0x00000fac, Size: 0x00000000, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RW (Exec base: 0x20000000, Load base: 0x00000fd0, Size: 0x00000000, Max: 0xffffffff, ABSOLUTE)
 
     **** No section assigned to this execution region ****
 
 
-    Execution Region ER_ZI (Exec base: 0x20000000, Load base: 0x00000fac, Size: 0x00000400, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_ZI (Exec base: 0x20000000, Load base: 0x00000fd0, Size: 0x00000400, Max: 0xffffffff, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -242,12 +242,12 @@ Image component sizes
        592         12          0          0          0        384   decode.o
        572        194          0          0          0        332   gpio.o
        444          8          0          0          0        344   lcd.o
-      1376        298          0          0          0        596   main.o
+      1412        300          0          0          0        608   main.o
        544        520          0          0       1024        720   startup.o
        484         92          0          0          0        348   utils.o
 
     ----------------------------------------------------------------------
-      4012       1124          0          0       1024       2724   Object Totals
+      4048       1126          0          0       1024       2736   Object Totals
          0          0          0          0          0          0   (incl. Generated)
          0          0          0          0          0          0   (incl. Padding)
 
@@ -262,15 +262,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-      4012       1124          0          0       1024       2724   Grand Totals
-      4012       1124          0          0       1024       2724   ELF Image Totals
-      4012       1124          0          0          0          0   ROM Totals
+      4048       1126          0          0       1024       2736   Grand Totals
+      4048       1126          0          0       1024       2736   ELF Image Totals
+      4048       1126          0          0          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                 4012 (   3.92kB)
+    Total RO  Size (Code + RO Data)                 4048 (   3.95kB)
     Total RW  Size (RW Data + ZI Data)              1024 (   1.00kB)
-    Total ROM Size (Code + RO Data + RW Data)       4012 (   3.92kB)
+    Total ROM Size (Code + RO Data + RW Data)       4048 (   3.95kB)
 
 ==============================================================================
 
