@@ -29,7 +29,7 @@ MSG_STATE_03_ROW_02				DCB			"Senha           ",0
 MSG_STATE_04_ROW_01				DCB			"Cofre Abrindo   ",0
 MSG_STATE_04_ROW_02				DCB			"                ",0
 MSG_STATE_05_ROW_01				DCB			"Cofre Travado   ",0
-MSG_STATE_05_ROW_02				DCB			"SenhaMestre     ",0
+MSG_STATE_05_ROW_02				DCB			"                ",0
 MSG_STATE_06_ROW_01				DCB			"Nova SenhaMestre",0
 MSG_STATE_06_ROW_02				DCB			"digite:         ",0
 MSG_STATE_07_ROW_01				DCB			"Digite a Senha  ",0
