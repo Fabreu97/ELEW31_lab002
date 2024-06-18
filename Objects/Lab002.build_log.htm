@@ -3,44 +3,50 @@
 <pre>
 <h1>µVision Build Log</h1>
 <h2>Tool Versions:</h2>
-IDE-Version: µVision V5.39.0.0
-Copyright (C) 2023 ARM Ltd and ARM Germany GmbH. All rights reserved.
-License Information: Eduardo Veiga, UTFPR, LIC=----
+IDE-Version: µVision V5.36.0.0
+Copyright (C) 2021 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: Fernando Abreu, UTFPR, LIC=----
  
 Tool Versions:
-Toolchain:       MDK-Lite  Version: 5.39.0.0
+Toolchain:       MDK-Lite  Version: 5.36.0.0
 Toolchain Path:  C:\Keil_v5\ARM\ARMCLANG\Bin
-C Compiler:      ArmClang.exe V6.21
-Assembler:       Armasm.exe V6.21
-Linker/Locator:  ArmLink.exe V6.21
-Library Manager: ArmAr.exe V6.21
-Hex Converter:   FromElf.exe V6.21
-CPU DLL:         SARMCM3.DLL V5.39.0.0
-Dialog DLL:      DCM.DLL V1.17.5.0
+C Compiler:      ArmClang.exe V6.16
+Assembler:       Armasm.exe V6.16
+Linker/Locator:  ArmLink.exe V6.16
+Library Manager: ArmAr.exe V6.16
+Hex Converter:   FromElf.exe V6.16
+CPU DLL:         SARMCM3.DLL V5.36.0.0
+Dialog DLL:      DCM.DLL V1.17.3.0
 Target DLL:      lmidk-agdi.dll V???
-Dialog DLL:      TCM.DLL V1.56.4.0
+Dialog DLL:      TCM.DLL V1.53.0.0
  
 <h2>Project:</h2>
-C:\Users\epont\OneDrive\Documentos\UTFPR\2024.1\SistemasMicrocontrolados\laboratorios\ELEW31_lab002\Lab002.uvprojx
-Project File Date:  05/14/2024
+C:\Users\Azelo\Documents\ELEW31_lab002\Lab002.uvprojx
+Project File Date:  06/17/2024
 
 <h2>Output:</h2>
-*** Using Compiler 'V6.21', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
+*** Using Compiler 'V6.16', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'Target 1'
-assembling Decode.s...
+"main.s", line 473 (column 10): Warning: A1865W: '#' not seen before constant expression
+  473 00000492  CMP  R0, '0'
+                        ^
+"main.s", line 62: Warning: A1581W: Added 1 bytes of padding at address 0xef
+   62 000000f0  BL   PLL_Init                   ;Chama a subrotina para alterar o clock do microcontrolador para 80MHz
+0 Errors, 2 Warnings
+assembling main.s...
 linking...
-Program Size: Code=3736 RO-data=0 RW-data=0 ZI-data=1024  
+Program Size: Code=4012 RO-data=0 RW-data=0 ZI-data=1024  
 ".\Objects\Lab002.axf" - 0 Error(s), 0 Warning(s).
 
 <h2>Software Packages used:</h2>
 
 Package Vendor: Keil
                 http://www.keil.com/pack/Keil.TM4C_DFP.1.1.0.pack
-                Keil::TM4C_DFP@1.1.0
+                Keil.TM4C_DFP.1.1.0
                 Texas Instruments Tiva C Series Device Support and Examples
 
 <h2>Collection of Component include folders:</h2>
-  C:/Users/epont/AppData/Local/Arm/Packs/Keil/TM4C_DFP/1.1.0/Device/Include/TM4C129
+  C:\Users\Azelo\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129
 
 <h2>Collection of Component Files used:</h2>
 Build Time Elapsed:  00:00:01

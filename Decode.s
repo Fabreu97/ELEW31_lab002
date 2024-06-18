@@ -297,7 +297,7 @@ Decode_Char_Coluna_4_Linha_4					;D
 	CMP		R1, #4
 	BXNE	LR									;Se coluna == 4 e linha invalida, retorna
 	LSL		R6, #8
-	ORR		R6, #0x44
+	ORR		R6, #0x44	
 
 	BX		LR
 	

@@ -35,6 +35,8 @@ MSG_STATE_06_ROW_02		DCB			"digite:         ",0
 MSG_STATE_07_ROW_01		DCB			"Digite a Senha  ",0
 MSG_STATE_07_ROW_02		DCB			"Mestre:         ",0
 
+USER_PASSWORD_ENTERED	DCB			"",0
+
 
 		; Se alguma função do arquivo for chamada em outro arquivo	
         EXPORT Start                ; Permite chamar a função Start a partir de 
@@ -68,15 +70,16 @@ Start
 	MOV		R9, #0						;Password Usuario para abrir o cofre
 	MOV		R10, #0						;Quantidade de Erros de senha
 	MOV		R11, #0						;Registrador do estado anterior
-	MOV		R12, #2						;Registrador do estado atual
+	MOV		R12, #1						;Registrador do estado atual
 	B		begin_here
 ; -------------------------------------------------------------------------------
 ; Função main()
 Main
-	BL	Read_Keyboard
-	BL	Decode_Char
-	B	Main
-
+	BL		Read_Keyboard
+	BL		Decode_Char
+	MOV		R0, #150
+	BL		SysTick_Wait1ms
+	BL		PrintPassWord
 	BL		State_Transition_Machine;	;Função de Transição de Estado
 	CMP 	R11, R12					;Comparando se o estado anterior é igual ao estado atual
 	BEQ		Main						;So sai por interrupção ou leitura
@@ -146,17 +149,13 @@ SW2_not_pressed_1
 	BNE		End_Machine					; 
 	MOV		R12, #2						; State 1(Cofre Aberto) -> State 2(Cofre Fechando)
 	
-	MOV		R1, #0						; registrador de acumulo para passar 1s
-	MOV		R0, #1						; entrada da função SysTick_Wait1ms
-wait_1s
-	ADD		R1,R1,#1
+	MOV		R1, #0						; passar 1s
+	MOV		R0, #1000					; entrada da função SysTick_Wait1ms
 	PUSH	{LR}
 	BL		SysTick_Wait1ms
 	POP		{LR}
 	CMP		R8, #1						; Compara se SW2 foi pressionado
 	BEQ		SW2_pressed_1
-	CMP		R1, #1000
-	BNE		wait_1s
 	B		End_Machine
 	
 SW2_pressed_1
@@ -405,12 +404,135 @@ State_7_exe
 	POP		{R0}
 	BX		LR
 ; Funções a serem feitas:
+;------------PrintPassWord------------
+; Função para checar o password é valido
+; Entrada: R0
+; Saída: Nenhuma
+; Modifica:
+PrintPassWord
+	PUSH	{R0,LR}
+	MOV		R0, #0xCC					;
+	BL		LCD_Move_Cursor				;
+	POP		{R0,LR}
+	
+	PUSH	{R0}
+	
+password_0
+	MOV		R1, #0						;
+	AND		R1, R6, #0xFF000000			; R1 recebe caracter da senha posição 0
+	LSR		R1, R1, #24					; traz o caracter da senha na posição 0 para os 8 pimeiros bits
+	CMP		R1, #0
+	BEQ		password_1
+	PUSH	{R0,LR}
+	MOV		R0, R1						;
+	BL		LCD_Write_Character			; imprimi password[1]
+	POP		{R0,LR}
+	
+password_1
+	MOV		R1, #0						;
+	AND		R1, R6, #0x00FF0000			; R1 recebe caracter da senha posição 1
+	LSR		R1, R1, #16					; traz o caracter da senha na posição 1 para os 8 pimeiros bits
+	CMP		R1, #0
+	BEQ		password_2
+	PUSH	{R0,LR}
+	MOV		R0, R1						;
+	BL		LCD_Write_Character			; imprimi password[1]
+	POP		{R0,LR}
+	
+password_2
+	MOV		R1, #0						;
+	AND		R1, R6, #0x0000FF00			; R1 recebe caracter da senha posição 2
+	LSR		R1, R1, #8					; traz o caracter da senha na posição 2 para os 8 pimeiros bits
+	CMP		R1, #0
+	BEQ		password_3
+	PUSH	{R0,LR}
+	MOV		R0, R1						;
+	BL		LCD_Write_Character			; imprimi password[1]
+	POP		{R0,LR}
+	
+password_3
+	MOV		R1, #0						;
+	AND		R1, R6, #0x000000FF			; R1 recebe caracter da senha posição 2
+	;LSR		R1, R1, #0					; traz o caracter da senha na posição 2 para os 8 pimeiros bits
+	CMP		R1, #0
+	BEQ		end_printpassword
+	PUSH	{R0,LR}
+	MOV		R0, R1						;
+	BL		LCD_Write_Character			; imprimi password[1]
+	POP		{R0,LR}
+
+end_printpassword
+	POP		{R0}
+	BX		LR
+;------------isDigit------------
+; Função para checar se valor de R0 é um digito
+; Entrada: R0
+; Saída: R0(0 = não é um digito  '#' / 1 = é um digito)
+; Modifica: R0
+isDigit
+	CMP		R0, '0'
+	BCC		not_digit
+	CMP		R0, #0x3A
+	BCS		not_digit
+is_digit
+	MOV		R0, #1;
+	BX		LR
+not_digit
+	MOV		R0, #0
+END_ISDIGIT
+	BX		LR
 ;------------CheckNewPassword------------
 ; Função para checar o password é valido
 ; Entrada: R5, R6
 ; Saída: R0(0 = password invalido ou nao sem  '#' / 1 = para password válido)
 ; Modifica: R9(Password do usuário)
 CheckNewPassword
+	PUSH	{R1,R4}
+	MOV		R4, #0
+	
+	;Comparo se '#' foi pressionado
+	CMP		R5, #0
+	BEQ		 END_CNP
+	
+	MOV		R0, #0						;
+	AND		R0, R6, #0x000000FF			; R1 recebe caracter da senha posição 3
+	PUSH	{LR}
+	BL		isDigit
+	POP		{LR}
+	CMP		R0, #0
+	BEQ		END_CNP
+	
+	MOV		R0, #0						;
+	AND		R0, R6, #0x0000FF00			; R1 recebe caracter da senha posição 2
+	LSR		R0, #8
+	PUSH	{LR}
+	BL		isDigit
+	POP		{LR}
+	CMP		R0, #0
+	BEQ		END_CNP
+	
+	MOV		R0, #0						;
+	AND		R0, R6, #0x00FF0000			; R1 recebe caracter da senha posição 1
+	LSR		R0, #16
+	PUSH	{LR}
+	BL		isDigit
+	POP		{LR}
+	CMP		R0, #0
+	BEQ		END_CNP
+	
+	MOV		R0, #0						;
+	AND		R0, R6, #0xFF000000			; R1 recebe caracter da senha posição 0
+	LSR		R0, #24
+	PUSH	{LR}
+	BL		isDigit
+	POP		{LR}
+	CMP		R0, #0
+	BEQ		END_CNP
+
+	MOV		R0, #1
+	MOV		R9, R6
+END_CNP
+	POP		{R1,R4}
 	BX		LR
 ;------------CheckPassword------------
 ; Função verificar se o Password esta correto, caso contrario incremento R10 ou nada se '#' n ter sido pressionado. Usar R0 se a senha foi digita certa
