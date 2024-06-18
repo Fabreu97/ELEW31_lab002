@@ -20,24 +20,21 @@
         AREA    |.text|, CODE, READONLY, ALIGN=2
 		
 ; constante de strings		
-MSG_STATE_01_ROW_01		DCB			"Cofre Aberto    ",0
-MSG_STATE_01_ROW_02		DCB			"Nova Senha:     ",0
-MSG_STATE_02_ROW_01		DCB			"Cofre Fechando  ",0
-MSG_STATE_02_ROW_02		DCB			"                ",0
-MSG_STATE_03_ROW_01		DCB			"Cofre Fechado   ",0
-MSG_STATE_03_ROW_02		DCB			"                ",0
-MSG_STATE_04_ROW_01		DCB			"Cofre Abrindo   ",0
-MSG_STATE_04_ROW_02		DCB			"                ",0
-MSG_STATE_05_ROW_01		DCB			"Cofre Travado   ",0
-MSG_STATE_05_ROW_02		DCB			"                ",0
-MSG_STATE_06_ROW_01		DCB			"Nova SenhaMestre",0
-MSG_STATE_06_ROW_02		DCB			"digite:         ",0
-MSG_STATE_07_ROW_01		DCB			"Digite a Senha  ",0
-MSG_STATE_07_ROW_02		DCB			"Mestre:         ",0
-
-USER_PASSWORD_ENTERED	DCB			"",0
-MASTERPASSWORD			DCB			"1234",0
-
+MSG_STATE_01_ROW_01				DCB			"Cofre Aberto    ",0
+MSG_STATE_01_ROW_02				DCB			"Nova Senha:     ",0
+MSG_STATE_02_ROW_01				DCB			"Cofre Fechando  ",0
+MSG_STATE_02_ROW_02				DCB			"                ",0
+MSG_STATE_03_ROW_01				DCB			"Cofre Fechado   ",0
+MSG_STATE_03_ROW_02				DCB			"Senha           ",0
+MSG_STATE_04_ROW_01				DCB			"Cofre Abrindo   ",0
+MSG_STATE_04_ROW_02				DCB			"                ",0
+MSG_STATE_05_ROW_01				DCB			"Cofre Travado   ",0
+MSG_STATE_05_ROW_02				DCB			"SenhaMestre     ",0
+MSG_STATE_06_ROW_01				DCB			"Nova SenhaMestre",0
+MSG_STATE_06_ROW_02				DCB			"digite:         ",0
+MSG_STATE_07_ROW_01				DCB			"Digite a Senha  ",0
+MSG_STATE_07_ROW_02				DCB			"Mestre:         ",0
+DEFAULT_MASTER_PASSWORD			DCB			"1234",0
 
 		; Se alguma função do arquivo for chamada em outro arquivo	
         EXPORT Start                ; Permite chamar a função Start a partir de 
@@ -57,9 +54,11 @@ MASTERPASSWORD			DCB			"1234",0
 		IMPORT	LCD_Reset
 		IMPORT	Read_Keyboard
 		IMPORT	Decode_Char
+		IMPORT	GPIOPortJ_Handler
 ; -------------------------------------------------------------------------------
 ; CONSTANTES
 REACTION_TIME				EQU			150
+MASTERPASSWORD				EQU			0x20005000			
 ; -------------------------------------------------------------------------------
 Start  		
 	BL 		PLL_Init                  	;Chama a subrotina para alterar o clock do microcontrolador para 80MHz
@@ -74,13 +73,19 @@ Start
 	MOV		R10, #0						;Quantidade de Erros de senha
 	MOV		R11, #0						;Registrador do estado anterior
 	MOV		R12, #1						;Registrador do estado atual
+	; Definindo a senha mestre padrão
+	;LDR		R0, =DEFAULT_MASTER_PASSWORD
+	;LDR		R1, =MASTERPASSWORD
+	;LDR		R2, [R0]
+	;STR		R2, [R1]
+	;LTORG								; Inserção da tabela de literais
 	B		begin_here
 ; -------------------------------------------------------------------------------
 ; Função main()
 Main
 	BL		Read_Keyboard
 	BL		Decode_Char
-	MOV		R0, REACTION_TIME
+	MOV		R0, #REACTION_TIME
 	BL		SysTick_Wait1ms
 	BL		PrintPassWord
 	BL		State_Transition_Machine;	;Função de Transição de Estado
@@ -121,11 +126,13 @@ State_6_lcd								;"Nova Senha Mestre"
 	CMP		R12, #6
 	BNE		State_7_lcd
 	BL		State_6_exe
+	BL		PrintPassWord
 	B		Main		
 State_7_lcd
 	CMP		R12, #7
 	BNE		Main
 	BL		State_7_exe
+	BL		PrintPassWord
 	B		Main
 ; --------------------------Funções-----------------------------------
 ;------------Satate_Transition_Machine------------
@@ -212,6 +219,7 @@ State_5
 	CMP		R7, #1						;
 	BNE		Sw1_Not_Pressed_5
 	MOV		R12, #7						; State 5(Cofre Travado) -> State 7(Solicitação da Senha Mestre)
+	MOV		R7, #0;
 	B		End_Machine
 Sw1_Not_Pressed_5
 	B		State_5						; salta para o estado 5 e só sai se SW1 for pressionado(Não precisa conferir a leitura do teclado matricial)
@@ -224,6 +232,7 @@ State_6
 	CMP		R0, #1
 	BNE		Incorrect_MasterPassword_6
 	MOV		R12, R11;					; State 6(Solicitação de uma Nova Senha) -> State 1(Cofre Aberto) || State 3(Cofre Fechado)
+	MOV		R11, #0
 Incorrect_MasterPassword_6
 	B		End_Machine
 State_7
@@ -473,7 +482,7 @@ end_printpassword
 ; Saída: R0(0 = não é um digito  '#' / 1 = é um digito)
 ; Modifica: R0
 isDigit
-	CMP		R0, '0'
+	CMP		R0, #'0'
 	BCC		not_digit
 	CMP		R0, #0x3A
 	BCS		not_digit
@@ -530,7 +539,6 @@ CheckNewPassword
 	CMP		R0, #0
 	BEQ		END_CNP
 
-	MOV		R0, #1
 	MOV		R9, R6
 	MOV		R6, #0
 END_CNP
@@ -564,6 +572,49 @@ END_CP
 ; Saída: R0(0 = password invalido ou nao sem  '#' / 1 = para password válido)
 ; Modifica: 
 CheckNewMasterPassword
+	;Comparo se '#' foi pressionado
+	CMP		R5, #0
+	BEQ		 END_CNMP
+	MOV		R5, #0
+	
+	MOV		R0, #0						;
+	AND		R0, R6, #0x000000FF			; R1 recebe caracter da senha posição 3
+	PUSH	{LR}
+	BL		isDigit
+	POP		{LR}
+	CMP		R0, #0
+	BEQ		END_CNMP
+	
+	MOV		R0, #0						;
+	AND		R0, R6, #0x0000FF00			; R1 recebe caracter da senha posição 2
+	LSR		R0, #8
+	PUSH	{LR}
+	BL		isDigit
+	POP		{LR}
+	CMP		R0, #0
+	BEQ		END_CNMP
+	
+	MOV		R0, #0						;
+	AND		R0, R6, #0x00FF0000			; R1 recebe caracter da senha posição 1
+	LSR		R0, #16
+	PUSH	{LR}
+	BL		isDigit
+	POP		{LR}
+	CMP		R0, #0
+	BEQ		END_CNMP
+	
+	MOV		R0, #0						;
+	AND		R0, R6, #0xFF000000			; R1 recebe caracter da senha posição 0
+	LSR		R0, #24
+	PUSH	{LR}
+	BL		isDigit
+	POP		{LR}
+	CMP		R0, #0
+	BEQ		END_CNMP
+	LDR		R1, =MASTERPASSWORD
+	STR		R6, [R1]
+	MOV		R6, #0
+END_CNMP
 	BX		LR
 ;------------CheckMasterPassword------------
 ; Função verificar se MasterPassaword é valido e se sim retorna R0=1 se Não retorna R0=0
@@ -571,6 +622,21 @@ CheckNewMasterPassword
 ; Saída: R0(0 = password invalido ou nao sem  '#' / 1 = para password válido)
 ; Modifica: 
 CheckMasterPassword
+	CMP		R5, #0
+	BEQ		 end_cmp_7
+	MOV		R5, #0
+
+	LDR		R1, =MASTERPASSWORD
+	LDR		R2, [R1]
+	CMP		R2, R6
+	BNE		masterpassword_wrong
+	MOV		R0, #1
+	MOV		R6, #0
+	BX		LR
+masterpassword_wrong
+	MOV		R0, #0
+	MOV		R6, #0
+end_cmp_7
 	BX		LR					;Chama a subrotina que inicializa o LCD
 ;--------------------------------------------------------------------------------
 Fim

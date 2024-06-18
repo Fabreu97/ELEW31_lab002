@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\Lab002.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\Lab002.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6160001: Last Updated: Mon Jun 17 23:55:23 2024
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6160001: Last Updated: Tue Jun 18 02:48:52 2024
 <BR><P>
 <H3>Maximum Stack Usage =          0 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -21,6 +21,7 @@ Functions with no stack information
  <LI><a href="#[6e]">GPIO_Init</a>
  <LI><a href="#[78]">ReadPortJ</a>
  <LI><a href="#[79]">PortNOutput</a>
+ <LI><a href="#[3d]">GPIOPortJ_Handler</a>
  <LI><a href="#[70]">Read_Keyboard</a>
  <LI><a href="#[71]">Decode_Char</a>
  <LI><a href="#[6f]">LCD_Init</a>
@@ -76,7 +77,7 @@ Function Pointers
  <LI><a href="#[28]">GPIOPortF_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[29]">GPIOPortG_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[2a]">GPIOPortH_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
- <LI><a href="#[3d]">GPIOPortJ_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
+ <LI><a href="#[3d]">GPIOPortJ_Handler</a> from gpio.o(.text) referenced from startup.o(RESET)
  <LI><a href="#[3e]">GPIOPortK_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[3f]">GPIOPortL_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
  <LI><a href="#[50]">GPIOPortM_Handler</a> from startup.o(RESET) referenced from startup.o(RESET)
@@ -306,9 +307,6 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> startup.o(RESET)
 </UL>
 <P><STRONG><a name="[2a]"></a>GPIOPortH_Handler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup.o(RESET))
-<BR>[Address Reference Count : 1]<UL><LI> startup.o(RESET)
-</UL>
-<P><STRONG><a name="[3d]"></a>GPIOPortJ_Handler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup.o(RESET))
 <BR>[Address Reference Count : 1]<UL><LI> startup.o(RESET)
 </UL>
 <P><STRONG><a name="[3e]"></a>GPIOPortK_Handler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup.o(RESET))
@@ -566,6 +564,9 @@ Global Symbols
 
 <P><STRONG><a name="[79]"></a>PortNOutput</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, gpio.o(.text), UNUSED)
 
+<P><STRONG><a name="[3d]"></a>GPIOPortJ_Handler</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, gpio.o(.text))
+<BR>[Address Reference Count : 1]<UL><LI> startup.o(RESET)
+</UL>
 <P><STRONG><a name="[70]"></a>Read_Keyboard</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, decode.o(.text))
 <BR><BR>[Calls]<UL><LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Wait1ms
 </UL>

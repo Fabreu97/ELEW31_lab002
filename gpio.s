@@ -179,6 +179,7 @@ GPIO_PORTL				EQU	2_000010000000000
 		EXPORT  GPIO_Init
 		EXPORT	ReadPortJ
 		EXPORT	PortNOutput
+		EXPORT	GPIOPortJ_Handler
 ; -------------------------------------------------------------------------------
 		IMPORT	SysTick_Wait1ms
 		IMPORT	SysTick_Wait1us
@@ -368,8 +369,13 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
 ;	0	->	borda de descida ou nível lógico baixo
 ;	1	->	borda de subida ou nível lógico alto
 			LDR		R0, =GPIO_PORTJ_AHB_IEV_R;
-			MOV		R1, #2_00;
+			MOV		R1, #2_10;
 			STRB	R1, [R0];
+; 11.5. Realizar o ACK	no registrador para ambos os pinos
+			
+			LDR		R0, =GPIO_PORTJ_AHB_ICR_R
+			MOV		R1, #2_11
+			STR		R1, [R0]
 ; 12. Habilitar as configurações dos registradores GPIOIM
 			LDR		R0, =GPIO_PORTJ_AHB_IM_R
 			MOV		R1, #2_11;
@@ -383,6 +389,13 @@ EsperaGPIO  LDR     R1, [R0]						;Lê da memória o conteúdo do endereço do regis
 			ORR		R1, R1, R2
 			STR		R1, [R0]
 ; 14. Habilitar a interrupção no NVIC(pág)  ENx  // x = 1
+			LDR		R0, =NVIC_PRI12_R
+			LDR		R2, [R0]
+			MOV		R1, #0x05
+			LSL		R1, R1, #27
+			ORR		R1, R1, R2
+			STR		R1, [R0]
+			
 			BX      LR;						retorno GPIO_Init
 
 ; -------------------------------------------------------------------------------
@@ -402,6 +415,30 @@ PortNOutput
 			LDR		R1, =GPIO_PORTN_DATA_R
 			STRB	R0, [R1]
 			BX		LR	
+; ---------------------------------------------------------------------------------
+; ------------------------------- INTERRUPÇÃO -------------------------------------
+; ---------------------------------------------------------------------------------
+		
+GPIOPortJ_Handler
+			LDR		R0, =GPIO_PORTJ_AHB_RIS_R
+			LDR		R1, [R0]
 			
+			AND		R2, R1, #2_01
+			CMP		R2, #2_01
+			BNE		sw1_not_pressed_Handler
+			MOV		R7, #2_1
+sw1_not_pressed_Handler
+			
+			AND		R2, R1, #2_10
+			CMP		R2, #2_10
+			BNE		sw2_not_pressed_Handler
+			MOV		R8, #2_1
+sw2_not_pressed_Handler
+
+			LDR		R0, =GPIO_PORTJ_AHB_ICR_R
+			MOV		R1, #2_11
+			STRB	R1, [R0]
+			
+			BX		LR
 	ALIGN
 	END

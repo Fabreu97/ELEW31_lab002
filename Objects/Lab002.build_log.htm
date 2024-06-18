@@ -27,16 +27,12 @@ Project File Date:  06/17/2024
 <h2>Output:</h2>
 *** Using Compiler 'V6.16', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'Target 1'
-"main.s", line 83 (column 10): Warning: A1865W: '#' not seen before constant expression
-   83 0000012e  MOV  R0, REACTION_TIME
-                        ^
-"main.s", line 476 (column 10): Warning: A1865W: '#' not seen before constant expression
-  476 00000496  CMP  R0, '0'
-                        ^
-0 Errors, 2 Warnings
+"main.s", line 64: Warning: A1581W: Added 1 bytes of padding at address 0xf3
+   64 000000f4  BL   PLL_Init                   ;Chama a subrotina para alterar o clock do microcontrolador para 80MHz
+0 Errors, 1 Warning
 assembling main.s...
 linking...
-Program Size: Code=4048 RO-data=0 RW-data=0 ZI-data=1024  
+Program Size: Code=4312 RO-data=0 RW-data=0 ZI-data=1024  
 ".\Objects\Lab002.axf" - 0 Error(s), 0 Warning(s).
 
 <h2>Software Packages used:</h2>
